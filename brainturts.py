@@ -191,9 +191,9 @@ while True:
     if mode[0] == -1:
         #define set
         source_set = ['blue','red','green','yellow','orange']
-        #num_stones = int(turtle.numinput('Number of slots', 'How many stones?'))
-        num_stones = 4
-        #create turtles, set up for drawing stones, results, headers etc.
+        #num_pegs = int(turtle.numinput('Number of slots', 'How many pegs?'))
+        num_pegs = 4
+        #create turtles, set up for drawing pegs, results, headers etc.
         write_turt = turtle.Turtle(visible = False)
         sol_turts = list()
         mark_turts = list()        
@@ -201,7 +201,7 @@ while True:
             sol_turts.append(turtle.Turtle(visible = False))
             mark_turts.append(turtle.Turtle(visible = False))       
         pick_turts = list()
-        for i in range(0, num_stones):
+        for i in range(0, num_pegs):
             pick_turts.append(turtle.Turtle(visible = False))        
         submit_turt = turtle.Turtle(visible = False)
         pause_turt = turtle.Turtle(visible = False)
@@ -256,7 +256,7 @@ while True:
             pause(pause_turt, -1000,-0)
             if submit_turt.color() == ('grey', 'grey'):               
                 break                    
-        #mute_color_picker_turts(pick_turts)
+        #reset screen and all turtles
         turtle.resetscreen()
         for t in col_turts:
             t.hideturtle()
@@ -292,12 +292,12 @@ while True:
             if proceed == 1:
                 #check for black count against assignment
                 black_counts_absolute.append(black_count(assignm, solution[i]))                
-                if black_counts_absolute[i] == 4:
-                    #print(assignm, i, solution[i])                    
+                if black_counts_absolute[i] == 4:                    
                     proceed = 5                
                 else:
                     proceed = 2
-            #if success, i.e. identical colors in identical positions as assignment, draw assignm, solution, stats; clean out vars & break        
+            #if success, i.e. identical colors in identical positions as assignment, draw assignm,
+            #solution, stats; clean out vars & break        
             if proceed == 5:                                     
                 #draw solution + header
                 draw_header(write_turt, 'Solution', 'black', -300, y_coord + 115)
@@ -334,6 +334,7 @@ while True:
                 if next_round[0] == 1:
                     proceed = 0
                     mode[0] = 1
+                    #reset screen and all turtles
                     turtle.resetscreen()
                     for t in col_turts:
                         t.hideturtle()
@@ -353,7 +354,8 @@ while True:
                    break
             
             if proceed == 2:
-                #black and white count of this solution against each previous solution must be same as absolute black and white counts of those previous solutions
+                #black and white count of this solution against each previous solution
+                #must be same as absolute black and white counts of those previous solutions
                 if i >= 1:
                     a = 0
                     while a < i:             
@@ -496,6 +498,7 @@ while True:
                         break
                 if next_round[0] is 1:
                     mode[0] = 0
+                    #reset screen and all turtles
                     turtle.resetscreen()
                     for t in col_turts:
                         t.hideturtle()
