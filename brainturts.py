@@ -2,6 +2,7 @@
 '''prepare visuals'''
 import turtle
 
+
 #set up screen
 wn = turtle.Screen()
 wn.bgcolor('lightgreen')
