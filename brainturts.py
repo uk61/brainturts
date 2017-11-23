@@ -1,13 +1,21 @@
 #!/usr/bin/python
+
+######Set path to a file where match statistics can be stored#####
+file_path = "/home/uk/dev/sites/coding/learning/braintwister/newdata.json"
+########
+
 '''prepare visuals'''
 import turtle
-
+from time import localtime, strftime, sleep
+import random
+import json
 
 #set up screen
 wn = turtle.Screen()
 wn.bgcolor('lightgreen')
 wn.screensize()
 wn.setup(width = 1.0, height = 1.0)
+wn.title('Mindturts')
 wn.listen()
 
 # define drawing functions
@@ -122,7 +130,6 @@ def pause(t,x,y):
     t.forward(0)     
     
 '''prepare games logic'''
-import random
 #define counting functions
 def white_count(list1,list2):
     #count occurrences of identical items in two lists
@@ -168,6 +175,24 @@ def mode_choice():
     wn.onkey(u_start, 'u')
     wn.onkey(c_start, 'c')
     wn.listen()
+
+#build stats dict
+def match_stats(time, rounds, comp_attempts, user_attempts):
+    m_stats = {time: {'rounds': rounds, 'comp_attempts': comp_attempts, 'user_attempts': user_attempts}}
+    return m_stats
+    
+def game_stats(path):
+    g_rounds = 0
+    g_comp_attempts = 0
+    g_user_attempts = 0
+    with open(path) as storage:
+        stored_stats = json.load(storage)
+    for k, v in stored_stats.items():
+        g_rounds += v['rounds']
+        g_comp_attempts += v['comp_attempts']
+        g_user_attempts += v['user_attempts']
+    g_stats = [g_rounds, g_comp_attempts, g_user_attempts]
+    return g_stats
     
 #set up vars for game logic
 i = 0
@@ -177,13 +202,10 @@ solutions = []
 black_counts_absolute = []
 white_counts_absolute = []
 y_coord = 240
-games_played = 0
+rounds_played = 0
 user_attempts = 0
 comp_attempts = 0
-user_played = 0
-comp_played = 0
 mode = [-1]
-#mode[0] = -1
 next_round = [0]
 '''Game starts'''
 while True:
@@ -227,7 +249,7 @@ while True:
             mode_choice()
             if mode[0] != -1:
                 break
-        
+        start_mode = mode[0]
         turtle.resetscreen()
         pause_turt.hideturtle()
         submit_turt.hideturtle()
@@ -238,9 +260,7 @@ while True:
             t.hideturtle()
         for t in mark_turts:
             t.hideturtle()    
-        
-        #mode_choice = int(turtle.textinput("Who is first? Type 'u' for your turn or 'c' for my turn!" ))
-        #mode = mode_choice    
+   
     '''user assigns problem, comp solves'''
     if mode[0] == 0:
         i = 0
@@ -312,28 +332,38 @@ while True:
                 for (key, color) in enumerate(assignm):
                     draw_bars(sol_turts[key], x,y,color)
                     x += 20                           
-                #count and print game stats
-                games_played += 1
-                comp_played += 1
-                comp_attempts += i                        
-                draw_header(write_turt, "Games played: "+ str(games_played), 'black', -500, y_coord + -300)
-                draw_header(write_turt, 'User played: '+ str(user_played), 'black', -500, y_coord + -325)
-                draw_header(write_turt, 'Comp played: '+ str(comp_played), 'black', -500, y_coord + -350)
-                draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -500, y_coord + -375)
-                draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -500, y_coord + -400)                     
-                #clean out vars
+                #collect match and game stats
+                rounds_played += 0.5
+                comp_attempts += i
+                time = strftime("%d.%m.%Y, %H:%M", localtime())
+                m_stats = match_stats(time, rounds_played, comp_attempts, user_attempts)
+                g_stats = game_stats(file_path)
+                #display stats
+                draw_header(write_turt, "Match stats:", 'red', -510, y_coord + -310)
+                draw_header(write_turt, "Rounds played: "+ str(int(rounds_played)), 'black', -510, y_coord + -335)
+                draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -510, y_coord + -360)
+                draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -510, y_coord + -385)
+                draw_header(write_turt, 'Previous games: ', 'red', -510, y_coord + -420)
+                draw_header(write_turt, 'Games total: '+ str(g_stats[0]), 'black', -510, y_coord + -445)
+                draw_header(write_turt, 'Totals user attempts: '+ str(g_stats[2]), 'black', -510, y_coord + -470)
+                draw_header(write_turt, 'Totals comp attempts: '+ str(g_stats[1]), 'black', -510, y_coord + -495)                #clean out vars
                 white_counts_absolute = []
                 black_counts_absolute = []
                 #ask user for another round
-                draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -500, y_coord + -500)
-                while True:
-                    pause(pause_turt, -1000,-0)
-                    play_again()                    
-                    if next_round[0] != 0:               
-                        break
+                if start_mode == 1:
+                    draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
+                    while True:
+                        pause(pause_turt, -1000,-0)
+                        play_again()                    
+                        if next_round[0] != 0:               
+                            break
+                else:
+                    next_round[0] = 1
+                    sleep(3)
                 if next_round[0] == 1:
                     proceed = 0
                     mode[0] = 1
+                    
                     #reset screen and all turtles
                     turtle.resetscreen()
                     for t in col_turts:
@@ -444,7 +474,7 @@ while True:
         draw_full_set(col_turts, -500, 40, -660, full_set)
         assignm = random.sample(full_set,4)        
         #draw mystery assignm + header
-        draw_header(write_turt, "Assignment", 'black', -500, y_coord + 115)
+        draw_header(write_turt, assignm, 'black', -500, y_coord + 115)
         x = -500
         y = y_coord
         for (key, color) in enumerate(assignm):
@@ -477,25 +507,36 @@ while True:
                 for (key, color) in enumerate(assignm):
                     draw_bars(sol_turts[key], x,y,color)
                     x += 20
-                #game stats
-                games_played += 1
-                user_played += 1
-                user_attempts += i                
-                draw_header(write_turt, "Games played: "+ str(games_played), 'black', -500, y_coord + -300)
-                draw_header(write_turt, 'User played: '+ str(user_played), 'black', -500, y_coord + -325)
-                draw_header(write_turt, 'Comp played: '+ str(comp_played), 'black', -500, y_coord + -350)
-                draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -500, y_coord + -375)
-                draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -500, y_coord + -400)
+                #collect match and game stats
+                rounds_played += 0.5
+                user_attempts += i
+                time = strftime("%d.%m.%Y, %H:%M", localtime())
+                m_stats = match_stats(time, rounds_played, comp_attempts, user_attempts)
+                g_stats = game_stats(file_path)
+                #display stats
+                draw_header(write_turt, "Match stats:", 'red', -510, y_coord + -310)
+                draw_header(write_turt, "Rounds played: "+ str(int(rounds_played)), 'black', -510, y_coord + -335)
+                draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -510, y_coord + -360)
+                draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -510, y_coord + -385)
+                draw_header(write_turt, 'Previous games: ', 'red', -510, y_coord + -420)
+                draw_header(write_turt, 'Games total: '+ str(g_stats[0]), 'black', -510, y_coord + -445)
+                draw_header(write_turt, 'Totals user attempts: '+ str(g_stats[2]), 'black', -510, y_coord + -470)
+                draw_header(write_turt, 'Totals comp attempts: '+ str(g_stats[1]), 'black', -510, y_coord + -495)
                 #clean out vars
                 white_counts_absolute = []
                 black_counts_absolute = []
+                
                 #ask user for another round
-                draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -500, y_coord + -500)
-                while True:
-                    pause(pause_turt, -1000,-0)
-                    play_again()                    
-                    if next_round[0] != 0:               
-                        break
+                if start_mode == 0:
+                    draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
+                    while True:
+                        pause(pause_turt, -1000,-0)
+                        play_again()                    
+                        if next_round[0] != 0:               
+                            break
+                else:
+                    next_round[0] = 1
+                    sleep(3)
                 if next_round[0] is 1:
                     mode[0] = 0
                     #reset screen and all turtles
@@ -554,6 +595,12 @@ while True:
             i += 1
     #quit the game
     if mode[0] == 3:
+        if file_path != '':
+            with open(file_path) as storage:
+                g_stats = json.load(storage)
+            g_stats.update(m_stats)
+            with open(file_path, 'w') as storage:    
+                json.dump(g_stats, storage)
         turtle.resetscreen()
         pause_turt.hideturtle()
         submit_turt.hideturtle()
@@ -567,6 +614,5 @@ while True:
         for t in col_turts:
             t.hideturtle()
         draw_header(write_turt, 'bye', 'black', 0, 0)
-        break
-      
+        break      
 wn.mainloop()
