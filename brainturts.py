@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = "/home/uk/dev/sites/coding/learning/braintwister/newdata.json"
+file_path = ""
 ########
 
 '''prepare visuals'''
@@ -474,7 +474,7 @@ while True:
         draw_full_set(col_turts, -500, 40, -660, full_set)
         assignm = random.sample(full_set,4)        
         #draw mystery assignm + header
-        draw_header(write_turt, assignm, 'black', -500, y_coord + 115)
+        draw_header(write_turt, 'Assignment', 'black', -500, y_coord + 115)
         x = -500
         y = y_coord
         for (key, color) in enumerate(assignm):
