@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = ""
+file_path = "/home/uk/dev/sites/coding/learning/braintwister/newdata.json"
 ########
 
-'''prepare visuals'''
 import turtle
 from time import localtime, strftime, sleep
 import random
@@ -59,7 +58,7 @@ def draw_mark(t, x, y, color):
     t.left(180)
     t.end_fill()        
     
-def draw_header(t, msg, color, x, y):
+def draw_header(t, msg, color, x, y, size='regular'):
     t.hideturtle()
     t.speed(10)
     t.penup()    
@@ -67,7 +66,12 @@ def draw_header(t, msg, color, x, y):
     t.sety(y)
     t.pendown()
     t.pencolor(color)
-    t.write(msg, move=False, align="left", font=("Arial", 16, "normal"))      
+    if size == 'small':
+        t.write(msg, move=False, align="left", font=("Arial", 12, "normal"))
+    elif size == 'bold':
+        t.write(msg, move=False, align="left", font=("Arial", 16, "bold"))
+    else:
+        t.write(msg, move=False, align="left", font=("Arial", 16, "normal"))      
 
 def color_submit(x, y):
     if x > -520 and x < -450 and y > -30 and y <-2:
@@ -166,6 +170,21 @@ def play_again():
     wn.onkey(stop, "n")
     wn.onkey(play, 'y')
     wn.listen()
+    
+def analyse():
+    see_analysis[0] = 1
+def no_analyse():
+    see_analysis[0] = 2
+def show_analysis():
+    wn.onkey(analyse, 'a')
+    wn.onkey(no_analyse, 's')
+    wn.listen()
+
+def move():
+    next_stage[0] = 1
+def move_on():
+    wn.onkey(move, 'g')
+    wn.listen()
 
 def c_start():
     mode[0] = 0
@@ -207,6 +226,9 @@ user_attempts = 0
 comp_attempts = 0
 mode = [-1]
 next_round = [0]
+next_stage = [0]
+see_analysis = [0]
+
 '''Game starts'''
 while True:
     #draw opening screen, set up the game
@@ -267,7 +289,8 @@ while True:
         next_round[0] = 0
         solution = []
         solutions = []
-        #draw full set
+        #draw full set, comp is on
+        draw_header(write_turt, 'comp is on', 'red', -510, y_coord + 185, 'bold')
         draw_full_set(col_turts, -500, 40, -660, full_set)
         #let user choose colors
         u_choice = ['red', 'red','red', 'red']        
@@ -336,7 +359,7 @@ while True:
                 rounds_played += 0.5
                 comp_attempts += i
                 time = strftime("%d.%m.%Y, %H:%M", localtime())
-                m_stats = match_stats(time, rounds_played, comp_attempts, user_attempts)
+                m_stats = match_stats(time, int(rounds_played), comp_attempts, user_attempts)
                 g_stats = game_stats(file_path)
                 #display stats
                 draw_header(write_turt, "Match stats:", 'red', -510, y_coord + -310)
@@ -344,11 +367,16 @@ while True:
                 draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -510, y_coord + -360)
                 draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -510, y_coord + -385)
                 draw_header(write_turt, 'Previous games: ', 'red', -510, y_coord + -420)
-                draw_header(write_turt, 'Games total: '+ str(g_stats[0]), 'black', -510, y_coord + -445)
+                draw_header(write_turt, 'Games total: '+ str(int(g_stats[0])), 'black', -510, y_coord + -445)
                 draw_header(write_turt, 'Totals user attempts: '+ str(g_stats[2]), 'black', -510, y_coord + -470)
-                draw_header(write_turt, 'Totals comp attempts: '+ str(g_stats[1]), 'black', -510, y_coord + -495)                #clean out vars
+                draw_header(write_turt, 'Totals comp attempts: '+ str(g_stats[1]), 'black', -510, y_coord + -495)
+                #store attempts and counts for analysis
+                stored_solutions = solutions
+                stored_black_counts = black_counts_absolute
+                stored_white_counts = white_counts_absolute
+                #clean out vars
                 white_counts_absolute = []
-                black_counts_absolute = []
+                black_counts_absolute = []                
                 #ask user for another round
                 if start_mode == 1:
                     draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
@@ -362,8 +390,7 @@ while True:
                     sleep(3)
                 if next_round[0] == 1:
                     proceed = 0
-                    mode[0] = 1
-                    
+                    mode[0] = 1                    
                     #reset screen and all turtles
                     turtle.resetscreen()
                     for t in col_turts:
@@ -376,8 +403,7 @@ while True:
                     for t in sol_turts:
                         t.hideturtle()
                     for t in mark_turts:
-                        t.hideturtle()
-        
+                        t.hideturtle()        
                     break
                 else:                           
                    mode[0] = 3
@@ -470,11 +496,12 @@ while True:
         i = 0
         next_round[0] = 0
         solutions = []
-        #draw full set
+        #draw full set, human is on
+        draw_header(write_turt, 'human is on', 'red', -510, y_coord + 185, 'bold')
         draw_full_set(col_turts, -500, 40, -660, full_set)
         assignm = random.sample(full_set,4)        
         #draw mystery assignm + header
-        draw_header(write_turt, 'Assignment', 'black', -500, y_coord + 115)
+        draw_header(write_turt, assignm, 'black', -500, y_coord + 115)
         x = -500
         y = y_coord
         for (key, color) in enumerate(assignm):
@@ -511,7 +538,7 @@ while True:
                 rounds_played += 0.5
                 user_attempts += i
                 time = strftime("%d.%m.%Y, %H:%M", localtime())
-                m_stats = match_stats(time, rounds_played, comp_attempts, user_attempts)
+                m_stats = match_stats(time, int(rounds_played), comp_attempts, user_attempts)
                 g_stats = game_stats(file_path)
                 #display stats
                 draw_header(write_turt, "Match stats:", 'red', -510, y_coord + -310)
@@ -519,27 +546,109 @@ while True:
                 draw_header(write_turt, 'User attempts: '+ str(user_attempts), 'black', -510, y_coord + -360)
                 draw_header(write_turt, 'Comp attempts: '+ str(comp_attempts), 'black', -510, y_coord + -385)
                 draw_header(write_turt, 'Previous games: ', 'red', -510, y_coord + -420)
-                draw_header(write_turt, 'Games total: '+ str(g_stats[0]), 'black', -510, y_coord + -445)
+                draw_header(write_turt, 'Games total: '+ str(int(g_stats[0])), 'black', -510, y_coord + -445)
                 draw_header(write_turt, 'Totals user attempts: '+ str(g_stats[2]), 'black', -510, y_coord + -470)
                 draw_header(write_turt, 'Totals comp attempts: '+ str(g_stats[1]), 'black', -510, y_coord + -495)
+                #store attempts and counts for analysis
+                stored_solutions = solutions
+                stored_black_counts = black_counts_absolute
+                stored_white_counts = white_counts_absolute
                 #clean out vars
                 white_counts_absolute = []
                 black_counts_absolute = []
-                
-                #ask user for another round
-                if start_mode == 0:
-                    draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
+                draw_header(write_turt, "press 'a' for analysis of your attempts, else press 's'", 'blue', -510, y_coord + -545)
+                see_analysis[0] = 0
+                while True:
+                    pause(pause_turt, -1000,-0)
+                    show_analysis()                    
+                    if see_analysis[0] != 0:               
+                        break                
+                turtle.resetscreen()
+                pause_turt.hideturtle()
+                submit_turt.hideturtle()
+                write_turt.hideturtle()
+                for t in pick_turts:
+                    t.hideturtle()        
+                for t in sol_turts:
+                    t.hideturtle()
+                for t in mark_turts:
+                    t.hideturtle()
+                for t in col_turts:
+                    t.hideturtle()
+                    
+                if see_analysis[0] == 1:
+                    alert = ''
+                    i = len(stored_solutions) -1
+                    if i <= 1:
+                        alert += 'at least two attempts needed for analysis, you got lucky!'
+                    if i >= 1:
+                        attempt_counter = 1            
+                        while attempt_counter < i:
+                            a = 0
+                            alert_counter = 0
+                            alert += '\n'
+                            while a < attempt_counter:
+                                if black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_black_counts[a]:
+                                    alert += 'In attempt ' + str((attempt_counter + 1)) + ', we see ' + str(black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' black(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_black_counts[a]) + '\n'
+                                    alert_counter += 1
+                                if white_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] and white_count(stored_solutions[a], stored_solutions[attempt_counter]) != black_count(stored_solutions[a], stored_solutions[attempt_counter]):                            
+                                    alert += 'In attempt ' + str((attempt_counter + 1)) + ', we find ' + str(white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_white_counts[a] - stored_black_counts[a]) + '\n'
+                                    alert_counter += 1
+                                #print(a)
+                                a +=1
+                            if alert_counter < 1:
+                                alert += 'No errors in attempt ' + str((attempt_counter + 1)) + ' \n '
+                            attempt_counter += 1
+                    #print(alert)
+                    draw_header(write_turt, 'Analysis', 'red', -510, y_coord + 115)
+                    
+                    #draw solution
+                    draw_header(write_turt, 'Attempts', 'black', 80, y_coord + 115)
+                    draw_header(write_turt, 'Marks', 'black', 200, y_coord + 115)
+                    draw_header(write_turt, 'Solution', 'black', -300, y_coord + 115)
+                    draw_header(write_turt, str(len(stored_solutions)), 'black', 280, y_coord + 115)
+                    x = -300
+                    for (key, color) in enumerate(stored_solutions[-1]):
+                            draw_bars(sol_turts[key], x, y_coord, color)
+                            x += 20
+                    for i in range(len(stored_solutions) - 1):    
+                        if i > 4:
+                            x = 380
+                            y = y_coord + -120 * (i -5)
+                        else:
+                            x = 80
+                            y = y_coord + -120 * i
+                        for (key, color) in enumerate(stored_solutions[i]):
+                            draw_bars(sol_turts[key], x, y, color)
+                            x += 20            
+                        if i > 4:
+                            x = 520
+                            y = y_coord + -120 * (i -5)
+                        else:
+                            x = 200
+                            y = y_coord + -120 * i
+                        for blacks in range(stored_black_counts[i]):
+                            draw_mark(mark_turts[blacks], x, y, 'black')
+                            x += 10
+                        #draw white marks
+                        if i > 4:
+                            x = 560
+                            y = y_coord + -120 * (i -5)
+                        else:
+                            x = 240
+                            y = y_coord + -120 * i
+                        for whites in range(stored_white_counts[i] - stored_black_counts[i]):
+                            draw_mark(mark_turts[whites], x, y, 'white')
+                            x += 10 
+                    
+                    draw_header(write_turt, alert, 'black', -510, 0, 'small')
+                    draw_header(write_turt, "press 'g' when you are ready to move on", 'blue', -510, y_coord + -545)
+                    next_stage[0] = 0
                     while True:
                         pause(pause_turt, -1000,-0)
-                        play_again()                    
-                        if next_round[0] != 0:               
+                        move_on()                    
+                        if next_stage[0] == 1:               
                             break
-                else:
-                    next_round[0] = 1
-                    sleep(3)
-                if next_round[0] is 1:
-                    mode[0] = 0
-                    #reset screen and all turtles
                     turtle.resetscreen()
                     for t in col_turts:
                         t.hideturtle()
@@ -551,11 +660,83 @@ while True:
                     submit_turt.hideturtle()
                     write_turt.hideturtle()                                 
                     for t in mark_turts:
-                        t.hideturtle()                    
-                    break
-                else:                           
-                   mode[0] = 3
-                   break  
+                        t.hideturtle()
+                    #ask user for another round
+                    if start_mode == 0:
+                        draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
+                        next_round[0] = 0
+                        while True:
+                            pause(pause_turt, -1000,-0)                            
+                            play_again()                    
+                            if next_round[0] != 0:               
+                                break
+                    else:
+                        next_round[0] = 1
+                        #sleep(3)
+                    if next_round[0] is 1:
+                        mode[0] = 0
+                        #reset screen and all turtles
+                        turtle.resetscreen()
+                        for t in col_turts:
+                            t.hideturtle()
+                        for t in sol_turts:
+                            t.hideturtle()
+                        for t in pick_turts:
+                            t.hideturtle()
+                        pause_turt.hideturtle()
+                        submit_turt.hideturtle()
+                        write_turt.hideturtle()                                 
+                        for t in mark_turts:
+                            t.hideturtle()                    
+                        break
+                    else:                           
+                       mode[0] = 3
+                       break 
+                        
+                if see_analysis[0] ==2:
+                    turtle.resetscreen()
+                    for t in col_turts:
+                        t.hideturtle()
+                    for t in sol_turts:
+                        t.hideturtle()
+                    for t in pick_turts:
+                        t.hideturtle()
+                    pause_turt.hideturtle()
+                    submit_turt.hideturtle()
+                    write_turt.hideturtle()                                 
+                    for t in mark_turts:
+                        t.hideturtle()
+                    #ask user for another round
+                    if start_mode == 0:
+                        draw_header(write_turt, "press 'y' for another round, press 'n' to quit", 'blue', -510, y_coord + -545)
+                        next_round[0] = 0
+                        while True:
+                            pause(pause_turt, -1000,-0)                            
+                            play_again()                    
+                            if next_round[0] != 0:               
+                                break
+                    else:
+                        next_round[0] = 1
+                        sleep(3)
+                    if next_round[0] is 1:
+                        mode[0] = 0
+                        #reset screen and all turtles
+                        turtle.resetscreen()
+                        for t in col_turts:
+                            t.hideturtle()
+                        for t in sol_turts:
+                            t.hideturtle()
+                        for t in pick_turts:
+                            t.hideturtle()
+                        pause_turt.hideturtle()
+                        submit_turt.hideturtle()
+                        write_turt.hideturtle()                                 
+                        for t in mark_turts:
+                            t.hideturtle()                    
+                        break
+                    else:                           
+                       mode[0] = 3
+                       break  
             
             #draw solution
             draw_header(write_turt, 'Attempts', 'black', 0, y_coord + 115)
@@ -614,5 +795,6 @@ while True:
         for t in col_turts:
             t.hideturtle()
         draw_header(write_turt, 'bye', 'black', 0, 0)
+        turtle.done()
         break      
 wn.mainloop()
