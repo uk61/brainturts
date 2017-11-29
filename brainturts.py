@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = "/home/uk/dev/sites/coding/learning/braintwister/newdata.json"
+file_path = ""
 ########
 
 import turtle
