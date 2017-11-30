@@ -556,6 +556,7 @@ while True:
                 #clean out vars
                 white_counts_absolute = []
                 black_counts_absolute = []
+                #ask user for analysis mode
                 draw_header(write_turt, "press 'a' for analysis of your attempts, else press 's'", 'blue', -510, y_coord + -545)
                 see_analysis[0] = 0
                 while True:
@@ -575,7 +576,7 @@ while True:
                     t.hideturtle()
                 for t in col_turts:
                     t.hideturtle()
-                    
+                '''display analysis'''    
                 if see_analysis[0] == 1:
                     alert = ''
                     i = len(stored_solutions) -1
