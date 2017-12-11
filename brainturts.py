@@ -720,8 +720,7 @@ while True:
                                         if black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_black_counts[a]:
                                             alert += 'In attempt ' + str((attempt_counter + 1)) + ', we see ' + str(black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' black(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_black_counts[a]) + '\n'
                                             alert_counter += 1
-                                        #if white_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] and white_count(stored_solutions[a], stored_solutions[attempt_counter]) != black_count(stored_solutions[a], stored_solutions[attempt_counter]):
-                                        if white_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] - stored_white_counts[attempt_counter]:
+                                        if white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] - stored_black_counts[a]:
                                             alert += 'In attempt ' + str((attempt_counter + 1)) + ', we find ' + str(white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_white_counts[a] - stored_black_counts[a]) + '\n'
                                             alert_counter += 1
                                         #print(a)
