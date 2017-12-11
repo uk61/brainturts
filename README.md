@@ -5,12 +5,11 @@ Feedback to each proposal comes in form of black marks for each color in correct
 and addtional white marks for matching colors.
 
 User can choose colors, pick a user name and decide if double colors are allowed. To store 
-those options, a path to a writable file must be provided at the top of the script.
+those options along with match stats, a path to a writable file must be provided at the top of the script.
 
 #### Good to know, when playing against comp:
-Computer does not use brute force to solve 
-the problem. Instead the process is built to match the human logic as much as possible. 
-Basically comp comes up with random solutions and then step by step compares against 
-the clues provided by white and black marks of previous attempts. 
+Computer does not use brute force to solve the problem. Instead the logic is built to match 
+human process as much as possible. Basically comp comes up with random solutions and then step by step
+compares against the clues provided by white and black marks of previous attempts. 
 
-Game is currently implemented in python3 using Turtle for GUI  
+The game is currently implemented in python3 using turtle for GUI.
