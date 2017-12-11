@@ -649,7 +649,7 @@ while True:
                 draw_full_set(full_set, -500, 40, -660)
                 assignm = random.sample(full_set,4)        
                 #draw mystery assignm + header
-                draw_header(write_t, assignm, 'black', -500, y_coord + 115)
+                draw_header(write_t, 'Assignment', 'black', -500, y_coord + 115)
                 grey_bars = ['grey', 'grey', 'grey', 'grey']
                 draw_bars(grey_bars, -500, y_coord, 20, 0)
                 while True:
