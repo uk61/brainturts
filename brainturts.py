@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = ""
+file_path = "/home/uk/dev/sites/coding/learning/braintwister/stats.json"
 ########
 
 import turtle
@@ -524,6 +524,7 @@ while True:
                 wn.bgcolor('lightgreen')
                 i = 0
                 next_round[0] = 0
+                move_on = [0]
                 solution = []
                 solutions = []
                 #draw full set, comp is on
@@ -552,7 +553,7 @@ while True:
                 while True:
                     if proceed == 0:
                         wn.tracer(1)
-                        #choose random colors, make sure it's not the same as previous attempts
+                        #choose random colors, make sure it's not the same set as previous attempts
                         x = random.sample(full_set,4)    
                         solution.append(x)
                         if solution[i] in solutions:
@@ -587,7 +588,7 @@ while True:
                         if file_path != '':
                             g_stats = game_stats(file_path)
                             draw_header(write_t, 'Previous games: ', font1, 'red', x1, y5 - line_space * 4)
-                            draw_header(write_t, 'Games total: '+ str(int(g_stats[0])), font1, 'black', x1, yy5 - line_space * 5)
+                            draw_header(write_t, 'Games total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
                             draw_header(write_t, 'Totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
                             draw_header(write_t, 'Totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
                         #store attempts and counts for analysis
@@ -688,6 +689,7 @@ while True:
                 wn.tracer(1)
                 i = 0
                 next_round[0] = 0
+                move_on = [0]
                 solutions = []
                 #draw full set, human is on
                 if u_name != '':
@@ -697,7 +699,7 @@ while True:
                 draw_full_set(full_set, x1, y7, x_off * 8)
                 assignm = random.sample(full_set,4)        
                 #draw mystery assignm + header
-                draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
+                draw_header(write_t, assignm, font1, 'black', x1, y2)
                 grey_bars = ['grey', 'grey', 'grey', 'grey']
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
@@ -775,7 +777,7 @@ while True:
                                         #print(a)
                                         a +=1
                                     if alert_counter < 1:
-                                        alert.append('No errors in attempt ' + str((attempt_counter + 1)))
+                                        alert.append('Couldn\'t find any errors in attempt ' + str((attempt_counter + 1)))
                                     attempt_counter += 1
                                     alert.append('')
                             #print(alert)
@@ -800,12 +802,16 @@ while True:
                             #draw analysis message        
                             if len(alert) <= 28:
                                 for msg in range(len(alert)):
+                                    if 'errors' in alert[msg]:
+                                        draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 4 - line_space_small * msg, 'small')
                                     if 'black' in alert[msg]:
                                         draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 4 - line_space_small * msg, 'small')
                                     if 'white' in alert[msg]:
                                         draw_header(write_t, alert[msg], font2, 'DarkSlateGrey', x1, y3 - y_off * 4 - line_space_small * msg, 'small')
                             else:
                                 for msg in range(28):
+                                    if 'no errors' in alert[msg]:
+                                        draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 4 - line_space_small * msg, 'small')
                                     if 'black' in alert[msg]:
                                         draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 4 - line_space_small * msg, 'small')
                                     if 'white' in alert[msg]:
@@ -823,6 +829,10 @@ while True:
                             #ask user for another round
                             if start_mode == 'comp':
                                 wn.bgcolor('lightgreen')
+                                if u_name != '':
+                                    draw_header(write_t, 'mindturts - ' + u_name + ' against comp', font1, 'red', x1, y1)
+                                else:
+                                    draw_header(write_t, 'mindturts - human against comp', font1, 'red', x1, y1)
                                 draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
                                 next_round[0] = 0
                                 while True:
@@ -846,6 +856,10 @@ while True:
                             wn.tracer(2)
                             #ask user for another round
                             if start_mode == 'comp':
+                                if u_name != '':
+                                    draw_header(write_t, 'mindturts - ' + u_name + ' against comp', font1, 'red', x1, y1)
+                                else:
+                                    draw_header(write_t, 'mindturts - human against comp', font1, 'red', x1, y1)
                                 draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
                                 next_round[0] = 0
                                 while True:
