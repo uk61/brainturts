@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = ''
+file_path = ""
 ########
 
 import turtle
@@ -12,48 +12,11 @@ import json
 #set up screen
 wn = turtle.Screen()
 wn.bgcolor('lightgreen')
-wn.screensize()
 wn.setup(width = 1.0, height = 1.0)
 wn.title('Mindturts')
 wn.listen()
 
 # define drawing functions
-
-def set_screensize():
-    return gsize
-
-#set grid measures for gui with factor allowing to adjust to different screen sizes
-gsize = 1
-
-x0 = -1000 * gsize
-x1 = -500 * gsize
-x2 = -300 * gsize
-x3 = 0 * gsize
-x4 = 300 * gsize
-y1 = 440 * gsize
-y2 = 360 * gsize
-y3 = 240 * gsize
-y4 = 20 * gsize
-y5 = -70 * gsize
-y6 = -305 * gsize
-y7 = -420 * gsize
-x_off = 5 * gsize
-y_off = 10 * gsize
-bar_height = 100 * gsize
-bar_width = 10 * gsize
-mark_height = 20 * gsize
-mark_width = 5 * gsize
-turtle_size_regular = round(1 * gsize)
-turtle_size_big = round(2 * gsize)
-line_space = 25 * gsize
-line_space_small = 18 * gsize
-short_row = round(15 * gsize)
-long_row = round(24 * gsize)
-font_small = round(12 * gsize)
-font_regular = round(16 * gsize)
-font1 = 'arial'
-font2 ='helvetica'
-
 def draw_bars(colorlist, x, y, x_offset, y_offset):
     peg_ts = []         
     for i in range(len(colorlist)):
@@ -102,7 +65,7 @@ def draw_header(t, msg, font, color, x, y, size='regular'):
     t.hideturtle()
     t.speed(0)
     t.penup()    
-    t.setx(x - x_off)
+    t.setx(x - x_off * 2)
     t.sety(y)
     t.pendown()
     t.pencolor(color)
@@ -121,7 +84,11 @@ def create_col_ts(src, size, shape):
     if shape != 'default':
         for turt in col_ts:
             turt.shape(shape)
-    if size != 'default':
+    if size == 'default':
+        for turt in col_ts:
+            turt.resizemode('user')
+            turt.shapesize(turtle_size_regular,turtle_size_regular,turtle_size_regular)
+    else:
         for turt in col_ts:
             turt.resizemode('user')
             turt.shapesize(turtle_size_big,turtle_size_big,turtle_size_big)
@@ -165,7 +132,7 @@ def draw_color_picker(colorlist, x, y, x_offset, y_offset, size = 'default', sha
     submit_t.setx(x - x_off *2)
     submit_t.sety(y4 + y_offset * -2)
     submit_t.color('green')
-    submit_t.write('submit', move= True, font=('arial', 16, 'bold'))
+    submit_t.write('submit', move= True, font=(font1, font_regular, "bold"))
     wn.onscreenclick(color_wheel_submit)
     
 def draw_full_set(colorlist, x, y, x_offset, size = 'default', shape = 'default'):
@@ -204,10 +171,14 @@ def select_color_l(x,y):
     for i in range(len(col_ts)):
         col_ts[i].color(picked_colors[(i + 1) * -1])
 
-def draw_cols(colorlist, x, y, x_offset, y_offset, row_length, size = 'default', shape = 'default'):
+def draw_cols(colorlist, x, y, x_offset, y_offset, size = 'default', shape = 'default'):
     # draw dynamic grid of clickable colors
     create_col_ts(colorlist, size, shape)
     num_rows = 0
+    if gsize < 0.7:
+        row_length = long_row
+    else:
+        row_length = short_row
     if len(colorlist) % row_length == 0:
         num_rows = int(len(colorlist) / row_length)
     else:
@@ -250,7 +221,7 @@ def submit(x, y):
     submit_t.setx(x)
     submit_t.sety(y)
     submit_t.color('green')
-    submit_t.write('submit', move= True, font=('arial', 16, 'bold'))
+    submit_t.write('submit', move = False, font=('arial', 16, 'bold'))
     wn.onscreenclick(color_submit)
         
 def pause(t,x,y):
@@ -263,10 +234,8 @@ def pause(t,x,y):
     
 #define turtles used in more than one mode
 submit_t = turtle.Turtle(visible = False)
-submit_t.shape('triangle')
 pause_t = turtle.Turtle(visible = False)
 write_t = turtle.Turtle(visible = False)
-write_t.shape('square')
     
 '''prepare games logic'''
 #define counting functions
@@ -291,7 +260,7 @@ def black_count(list1,list2):
 #set up set
 def get_set(src):
     new_set = []
-    for i in range(0,max_num_color):
+    for i in range(max_num_color):
         for item in src:
             new_set.append(item)
     return new_set            
@@ -347,7 +316,7 @@ def match_stats(time, rounds, comp_attempts, user_attempts):
     return m_stats
 
 def user_options():
-    vals = {'user options': {'u_name': u_name, 'u_colors': u_colors, 'max_num_color': max_num_color}}
+    vals = {'user options': {'u_name': u_name, 'u_colors': u_colors, 'max_num_color': max_num_color, 'gsize': gsize}}
     return vals    
     
 def game_stats(path):
@@ -364,17 +333,52 @@ def game_stats(path):
     g_stats = [g_rounds, g_comp_attempts, g_user_attempts]
     return g_stats
 
-#vars used in more than one mode
+#read stored user options
 u_name = ''
+gsize = 1
 if file_path != '':
     with open(file_path) as storage:
         options = json.load(storage)
         for k,v in options.items():
             if k == 'user options' and v['u_name'] != '':        
                 u_name = options['user options']['u_name']
+            if k == 'user options':
+                gsize = options['user options']['gsize']
+               
+#set grid measures for gui with factor allowing to adjust to different screen sizes
+x0 = -1000 * gsize
+x1 = -500 * gsize
+x2 = -300 * gsize
+x3 = 0 * gsize
+x4 = 300 * gsize
+y1 = 440 * gsize
+y2 = 360 * gsize
+y3 = 240 * gsize
+y4 = 20 * gsize
+y5 = -70 * gsize
+y6 = -305 * gsize
+y7 = -420 * gsize
+x_off = 5 * gsize
+y_off = 10 * gsize
+bar_height = 100 * gsize
+bar_width = 10 * gsize
+mark_height = 20 * gsize
+mark_width = 5 * gsize
+turtle_size_regular = (1 * gsize)
+turtle_size_big = round(2 * gsize)
+line_space = 25 * gsize
+line_space_small = 18 * gsize
+short_row = round(15 * gsize)
+long_row = round(24 * gsize)
+font_small = round(12 * gsize)
+font_regular = round(16 * gsize)
+font1 = 'arial'
+font2 ='helvetica'
+
 mode = ['start']    
 u_colors = []
 move_on = [0]
+num_pegs = 4
 
 ''' START OF GAME '''
 
@@ -410,22 +414,20 @@ while True:
         u_name = wn.textinput('username', 'Please, type your name')
         wn.clearscreen()
         wn.bgcolor('lightgreen')
-        write_t.hideturtle()
-        #ask user for for number of doublettes
+        #ask user for for doublettes
         draw_header(write_t, "Are double colors allowed?", font1, 'black', x2, y2)
         doubles = turtle.textinput('Doubles allowed', 'Yes or no?')
         if doubles in ('yes', 'Yes', 'y'):
             max_num_color = 2
         else:
             max_num_color = 1
-        wn.clearscreen()
+        wn.clearscreen()        
         wn.bgcolor('lightgreen')
         write_t.hideturtle()
         choose_color_msg = 'thanks, '+ u_name + ', please choose five colors to play with'
         draw_header(write_t, choose_color_msg, font1, 'black', x1, y1)
-        write_t.hideturtle()
         wn.tracer(2)
-        draw_cols(all_colors, x1, y3, x_off * 12, y_off * 6, short_row, 'big', 'square')
+        draw_cols(all_colors, x1, y3, x_off * 12, y_off * 6, 'big', 'square')
         draw_picked_cols(picked_colors, x1, y2, x_off *6, y_off * 0)
         submit(x2, y2 - y_off)
         wn.tracer(1)
@@ -434,12 +436,23 @@ while True:
             if submit_t.pencolor() == 'grey':
                 wn.tracer(2)
                 break
-        wn.clearscreen()
+        wn.clearscreen()        
         wn.bgcolor('lightgreen')
+        draw_header(write_t, "you may change the game size to accomodate your screen.\n default is 1, which works well on a 1280 * 1048 screen. \n a value like 0.5 works well on a 800 * 600 screen.", font1, 'black', x2, y2 - y_off * 4)
+        gsize = turtle.numinput('Resize factor', 'default is 1.0')
+        wn.clearscreen()        
+        wn.bgcolor('lightgreen')
+        draw_header(write_t, 'thanks, ' + u_name, font1, 'black', x1, y1)
+        draw_header(write_t, 'these are the colors you have picked', font2, 'black', x1, y2)
         for i in range(5):
             u_colors.append(picked_colors[(i + 1) * -1])    
-        draw_cols(u_colors, x1, y2, x_off * 12, y_off * 6, short_row, 'big', 'circle')
-        draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6)
+        draw_cols(u_colors, x1, y2 - y_off * 4, x_off * 12, y_off * 6, 'big', 'circle')
+        if max_num_color == 2:
+            draw_header(write_t, 'double colors are allowed', font2, 'black', x1, y3 - y_off * 2)
+        else:
+            draw_header(write_t, 'double colors are not allowed', font2, 'black', x1, y3 - y_off * 2)
+        draw_header(write_t, 'the factor for adjusting game size is at ' + str(gsize), font2, 'black', x1, y3 - line_space *2)
+        draw_header(write_t, "press 'g' when you are ready to move on", font2, 'blue', x1, y6)
         wn.tracer(1)
         while True:
             pause(pause_t, x0, y4)
@@ -459,6 +472,36 @@ while True:
             
         '''PLAY AGAINST COMP'''      
     elif mode[0] == 'duo':
+        #second calling of grid valuesin case user has changed gsize in options mode
+        x0 = -1000 * gsize
+        x1 = -500 * gsize
+        x2 = -300 * gsize
+        x3 = 0 * gsize
+        x4 = 300 * gsize
+        y1 = 440 * gsize
+        y2 = 360 * gsize
+        y3 = 240 * gsize
+        y4 = 20 * gsize
+        y5 = -70 * gsize
+        y6 = -305 * gsize
+        y7 = -420 * gsize
+        x_off = 5 * gsize
+        y_off = 10 * gsize
+        bar_height = 100 * gsize
+        bar_width = 10 * gsize
+        mark_height = 20 * gsize
+        mark_width = 5 * gsize
+        turtle_size_regular = (1 * gsize)
+        turtle_size_big = round(2 * gsize)
+        line_space = 25 * gsize
+        line_space_small = 18 * gsize
+        short_row = round(15 * gsize)
+        long_row = round(24 * gsize)
+        font_small = round(12 * gsize)
+        font_regular = round(16 * gsize)
+        font1 = 'arial'
+        font2 ='helvetica'
+        
         wn.bgcolor('lightgreen')
         wn.tracer(1)
         wn.title('mindturts - human vs. computer')
@@ -476,8 +519,7 @@ while True:
         next_round = [0]
         next_stage = [0]
         see_analysis = [0]
-        max_num_color = 2
-        test_c = 0
+        grey_bars = ['grey', 'grey', 'grey', 'grey']    
         if file_path != '':
             with open(file_path) as storage:
                 options = json.load(storage)
@@ -505,14 +547,13 @@ while True:
                     source_set = u_colors
                 else:
                     source_set = ['blue','red','green','yellow','orange']
-                #num_pegs = int(turtle.numinput('Number of slots', 'How many pegs?'))
-                num_pegs = 4
                 #create set of pegs
                 full_set = get_set(source_set)
                 #create turtles, set up for drawing pegs, results, headers etc.
                 wn.tracer(2)    
                 wn.clearscreen()
                 pause_t.hideturtle()                
+            
             '''user assigns problem, comp solves'''
             if whos_on[0] == 'comp':
                 if mode[0] != 'duo':
@@ -532,20 +573,21 @@ while True:
                 for j in range(4):
                     u_choice.append(source_set[0])
                 draw_header(write_t, 'pick your colors', font1, 'black', x1, y4 + y_off * 2)
-                draw_color_picker(u_choice, x1, y4, x_off * 8, y_off * 2)        
+                draw_color_picker(u_choice, x1, y4, x_off * 8, y_off * 2)
                 while True:
                     pause(pause_t, x0, y4)
                     if submit_t.pencolor() == 'grey':
                         wn.tracer(2)
                         break                    
-                #reset screen and all turtles
                 wn.clearscreen()                
                 #draw hidden assignm + header
                 wn.bgcolor('lightgreen')
                 draw_header(write_t, 'comp is on', font1, 'red', x1, y1)
                 assignm = u_choice
                 draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
-                draw_bars(assignm, x1, y3, x_off * 4, y_off * 0)
+                draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
+                
+                ''' Enter attempt loop'''
                 while True:
                     if proceed == 0:
                         wn.tracer(1)
@@ -614,7 +656,6 @@ while True:
                         if next_round[0] == 1:
                             proceed = 0
                             whos_on[0] = 'user'                    
-                            #reset screen and all turtles
                             wn.clearscreen()
                             break
                         else:                           
@@ -652,9 +693,8 @@ while True:
                                     proceed = 0                   
                             if proceed == 4:
                                 solutions.append(solution[i])                        
-                                #draw solution
+                                #draw solution, black, white marks
                                 draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)    
-                                #draw black, white marks
                                 draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
                                 draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
                                 sleep(2)
@@ -663,11 +703,9 @@ while True:
                         else:
                             white_counts_absolute.append(white_count(assignm, solution[i]))
                             solutions.append(solution[i])                    
-                            #draw attempts header
+                            #draw attempts header, solution, marks header and marks
                             draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
-                            #draw solution
                             draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
-                            #draw marks header, black, white marks
                             draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
                             draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
                             draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
@@ -694,7 +732,6 @@ while True:
                 assignm = random.sample(full_set,4)        
                 #draw mystery assignm + header
                 draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
-                grey_bars = ['grey', 'grey', 'grey', 'grey']
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
                     #let user choose colors
@@ -711,7 +748,7 @@ while True:
                     #calculate black marks, and...
                     solutions.append(u_choice)
                     black_counts_absolute.append(black_count(assignm, solutions[i]))
-                    #...if success, draw assignm, break
+                    #...if success, draw assignm, stats, analysis and break
                     if black_counts_absolute[i] == 4:
                         draw_header(write_t, 'Solution', font1, 'black', x2, y2)
                         draw_bars(solutions[i], x2, y3, x_off * 4, y_off * 0)
@@ -739,6 +776,7 @@ while True:
                         #clean out vars
                         white_counts_absolute = []
                         black_counts_absolute = []
+                        #ask for analysis
                         draw_header(write_t, "press 'a' for analysis of your attempts, else press 's'", font1, 'blue', x1, y6 - line_space * 2)
                         see_analysis[0] = 0
                         show_analysis()
@@ -746,7 +784,8 @@ while True:
                             pause(pause_t, x0, y4)                                                
                             if see_analysis[0] != 0:               
                                 break                
-                        wn.clearscreen()                            
+                        wn.clearscreen()
+                        #calculate and display analysis
                         if see_analysis[0] == 1:
                             wn.bgcolor('lightgreen')
                             wn.tracer(2)
@@ -767,13 +806,11 @@ while True:
                                         if white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] - stored_black_counts[a]:
                                             alert.append('In attempt ' + str((attempt_counter + 1)) + ', we find ' + str(white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_white_counts[a] - stored_black_counts[a]))
                                             alert_counter += 1
-                                        #print(a)
                                         a +=1
                                     if alert_counter < 1:
                                         alert.append('Couldn\'t find any errors in attempt ' + str((attempt_counter + 1)))
                                     attempt_counter += 1
                                     alert.append('')
-                            #print(alert)
                             draw_header(write_t, 'Analysis', font1, 'red', x1, y2)                            
                             #draw headers, solution
                             draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
@@ -838,13 +875,12 @@ while True:
                                 next_round[0] = 1
                             if next_round[0] is 1:
                                 whos_on[0] = 'comp'
-                                #reset screen and all turtles
                                 wn.clearscreen()
                                 break
                             else:                           
                                 mode[0] = 'end'
                                 break 
-                                
+                        #in case analylis is not requested, ask for another round or move to 'comp is on'        
                         if see_analysis[0] == 2:
                             wn.bgcolor('lightgreen')
                             wn.tracer(2)
@@ -872,15 +908,14 @@ while True:
                                mode[0] = 'end'
                                wn.clearscreen()
                                break                      
-                    #draw solution
+                    
+                    #if attempt was not successfull, calculate white marks and draw attempt, marks
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
                         draw_bars(solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
                     else:
                         draw_bars(solutions[i], x3, y3, x_off * 4, y_off * -12 * i)
-                    #calculate white marks
                     white_counts_absolute.append(white_count(assignm, solutions[i]))            
-                    #draw marks header, black, white marks
                     draw_header(write_t, 'Marks', font1, 'black', x3 +x_off * 24, y2)
                     if i > 4:
                         draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i -5), 'black')
