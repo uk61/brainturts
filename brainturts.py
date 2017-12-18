@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = "/home/uk/dev/sites/coding/learning/braintwister/stats.json"
+file_path = ""
 ########
 
 import turtle
@@ -417,7 +417,6 @@ while True:
         wn.bgcolor('lightgreen')
         wn.title('mindturts - options')
         all_colors = ['Black', 'Navy', 'DarkBlue', 'MediumBlue', 'Blue', 'DarkGreen', 'Green', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen', 'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue', 'LightSeaGreen', 'ForestGreen', 'SeaGreen', 'DarkSlateGray', 'LimeGreen', 'MediumSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'DarkSlateBlue', 'MediumTurquoise', 'Indigo', 'DarkOliveGreen', 'CadetBlue', 'CornflowerBlue', 'RebeccaPurple', 'MediumAquaMarine', 'DimGray', 'SlateBlue', 'SlateGray', 'LightSlateGray', 'MediumSlateBlue', 'Chartreuse', 'Aquamarine', 'Maroon', 'Purple', 'Olive', 'Grey', 'SkyBlue', 'LightSkyBlue', 'PaleGreen', 'DarkGray', 'DarkGrey', 'LightBlue', 'GreenYellow', 'PaleTurquoise', 'LightSteelBlue', 'PowderBlue', 'FireBrick', 'DarkGoldenRod', 'MediumOrchid', 'RosyBrown', 'DarkKhaki', 'Silver', 'MediumVioletRed', 'IndianRed', 'Peru', 'Chocolate', 'LightGray', 'Orchid', 'GoldenRod', 'Gainsboro', 'Plum', 'BurlyWood', 'LightCyan', 'Lavender', 'DarkSalmon', 'Violet', 'PaleGoldenRod', 'LightCoral', 'Khaki', 'AliceBlue', 'HoneyDew', 'Azure', 'SandyBrown', 'Wheat', 'Beige', 'MintCream', 'GhostWhite', 'Salmon', 'AntiqueWhite', 'Linen', 'LightGoldenRodYellow', 'OldLace', 'Red', 'Fuchsia', 'Magenta', 'DeepPink', 'OrangeRed', 'Tomato', 'HotPink', 'Coral', 'DarkOrange', 'LightSalmon', 'Orange', 'LightPink', 'Pink', 'Gold', 'PeachPuff', 'NavajoWhite', 'Moccasin', 'Bisque', 'MistyRose', 'BlanchedAlmond', 'PapayaWhip', 'LavenderBlush', 'SeaShell', 'Cornsilk', 'LemonChiffon', 'Snow', 'Yellow', 'LightYellow']
-        #all_colors = ['Black', 'Navy', 'DarkBlue', 'Orange', 'Beige']
         picked_colors = ['white', 'white','white','white','white']
         draw_header(write_t, 'Please choose your name', font1, 'black', x2, y2)
         u_name = wn.textinput('username', 'Please, type your name')
@@ -558,7 +557,6 @@ while True:
                     source_set = ['blue','red','green','yellow','orange']
                 #create set of pegs
                 full_set = get_set(source_set)
-                #create turtles, set up for drawing pegs, results, headers etc.
                 wn.tracer(2)    
                 wn.clearscreen()
                 pause_t.hideturtle()                
@@ -574,7 +572,6 @@ while True:
                 solution = []
                 solutions = []
                 #draw full set, comp is on
-                #wn.tracer(2)
                 draw_header(write_t, 'comp is on', font1, 'red', x1, y1)
                 draw_full_set(full_set, x1, y7, x_off * 8)
                 draw_marks(4, x3, y7 - y_off, x_off * 2, y_off * -12 * i, 'black')
@@ -710,6 +707,7 @@ while True:
                                 sleep(2)
                                 i += 1
                                 break
+            
             '''comp assigns problem, user solves'''
             if whos_on[0] == 'user':
                 if mode[0] != 'duo':
@@ -899,7 +897,6 @@ while True:
                                         break
                             else:
                                 next_round[0] = 1
-                                #sleep(3)
                             if next_round[0] is 1:
                                 whos_on[0] = 'comp'
                                 wn.clearscreen()                    
@@ -940,5 +937,4 @@ while True:
         else:
             draw_header(write_t, 'bye', font1, 'black', x3, y4)
         sleep(2)
-        break 
-#wn.mainloop()
+        break
