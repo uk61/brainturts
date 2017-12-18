@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ######Set path to a file where match statistics can be stored#####
-file_path = ""
+file_path = "/home/uk/dev/sites/coding/learning/braintwister/stats.json"
 ########
 
 import turtle
@@ -10,9 +10,11 @@ import random
 import json
 
 #set up screen
+screen_width = 1.0
+screen_height = 1.0
 wn = turtle.Screen()
 wn.bgcolor('lightgreen')
-wn.setup(width = 1.0, height = 1.0)
+wn.setup(width = screen_width, height = screen_height)
 wn.title('Mindturts')
 wn.listen()
 
@@ -393,6 +395,12 @@ while True:
         draw_header(write_t, 'mission: find out which four colored pegs the opponent secretely has chosen', font1, 'black', x2, y2 - line_space * 3)
         draw_header(write_t, 'the computer can not err, so you better make no mistakes either...', font1, 'black', x2, y2 - line_space * 4)
         draw_header(write_t, 'good luck!', font1, 'black', x2, y2 - line_space * 5)
+        if file_path != '':
+            g_stats = game_stats(file_path)
+            draw_header(write_t, 'previous matches: ', font1, 'red', x1, y5 - line_space * 4)
+            draw_header(write_t, 'matches total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
+            draw_header(write_t, 'totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
+            draw_header(write_t, 'totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
         draw_header(write_t, "press '1' to start a new match", font1, 'blue', x1, y6)
         draw_header(write_t, "press '2' to set game options", font1, 'blue', x1, y6 - line_space * 1)
         draw_header(write_t, "press '3' to end the game", font1, 'blue', x1, y6 - line_space * 2)
@@ -403,6 +411,7 @@ while True:
                 wn.tracer(2)
                 break
         wn.clearscreen()
+    
     ''' SET USER OPTIONS '''
     if mode[0] == 'options':
         wn.bgcolor('lightgreen')
@@ -472,7 +481,7 @@ while True:
             
         '''PLAY AGAINST COMP'''      
     elif mode[0] == 'duo':
-        #second calling of grid valuesin case user has changed gsize in options mode
+        #second calling of grid values in case user has changed gsize in options mode
         x0 = -1000 * gsize
         x1 = -500 * gsize
         x2 = -300 * gsize
@@ -565,14 +574,17 @@ while True:
                 solution = []
                 solutions = []
                 #draw full set, comp is on
-                wn.tracer(1)
+                #wn.tracer(2)
                 draw_header(write_t, 'comp is on', font1, 'red', x1, y1)
                 draw_full_set(full_set, x1, y7, x_off * 8)
+                draw_marks(4, x3, y7 - y_off, x_off * 2, y_off * -12 * i, 'black')
+                draw_marks(4, x3 + x_off * 14, y7 - y_off, x_off * 2, y_off * -12 * i, 'white')
                 #let user choose colors
                 u_choice = []
                 for j in range(4):
                     u_choice.append(source_set[0])
                 draw_header(write_t, 'pick your colors', font1, 'black', x1, y4 + y_off * 2)
+                wn.tracer(1)
                 draw_color_picker(u_choice, x1, y4, x_off * 8, y_off * 2)
                 while True:
                     pause(pause_t, x0, y4)
@@ -582,143 +594,128 @@ while True:
                 wn.clearscreen()                
                 #draw hidden assignm + header
                 wn.bgcolor('lightgreen')
+                wn.tracer(2)
                 draw_header(write_t, 'comp is on', font1, 'red', x1, y1)
+                draw_full_set(full_set, x1, y7, x_off * 8)
+                draw_marks(4, x3, y7 - y_off, x_off * 2, y_off * -12 * i, 'black')
+                draw_marks(4, x3 + x_off * 14, y7 - y_off, x_off * 2, y_off * -12 * i, 'white')
                 assignm = u_choice
                 draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
+                wn.tracer(1)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
-                
-                ''' Enter attempt loop'''
+                ''' Enter attempt loop'''                
                 while True:
-                    if proceed == 0:
-                        wn.tracer(1)
+                    if whos_on[0] != 'comp' or mode[0] != 'duo':
+                        break
+                    while True:
                         #choose random colors, make sure it's not the same set as previous attempts
                         x = random.sample(full_set,4)    
                         solution.append(x)
                         if solution[i] in solutions:
                             del solution[-1]
-                            proceed = 0
-                        else:
-                            proceed = 1        
-                    if proceed == 1:
+                            break      
                         #check for black count against assignment
                         black_counts_absolute.append(black_count(assignm, solution[i]))                
                         if black_counts_absolute[i] == 4:                    
-                            proceed = 5                
+                        #if success, i. e. attempt matches assignment, draw assignm, solution, stats; clean out vars & break        
+                            wn.tracer(1)
+                            #draw solution + header
+                            draw_header(write_t, 'Solution', font1, 'black', x2, y2)
+                            draw_bars(solution[i], x2, y3, x_off * 4, y_off * 0)
+                            draw_bars(assignm, x1, y3, x_off * 4, y_off * 0)
+                            #collect match and game stats and display
+                            wn.tracer(1)
+                            rounds_played += 0.5
+                            comp_attempts += i
+                            time = strftime("%d.%m.%Y, %H:%M", localtime())
+                            m_stats = match_stats(time, int(rounds_played), comp_attempts, user_attempts)                    
+                            draw_header(write_t, "match stats:", font1, 'red', x1, y5)
+                            draw_header(write_t, "rounds played: "+ str(int(rounds_played)), font1, 'black', x1, y5 - line_space)
+                            draw_header(write_t, 'user attempts: '+ str(user_attempts), font1, 'black', x1, y5 - line_space * 2)
+                            draw_header(write_t, 'comp attempts: '+ str(comp_attempts), font1, 'black', x1, y5 - line_space * 3)
+                            if file_path != '':
+                                g_stats = game_stats(file_path)
+                                draw_header(write_t, 'previous matchess: ', font1, 'red', x1, y5 - line_space * 4)
+                                draw_header(write_t, 'matches total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
+                                draw_header(write_t, 'totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
+                                draw_header(write_t, 'totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
+                            #clean out vars
+                            white_counts_absolute = []
+                            black_counts_absolute = []                
+                            #ask user for another round
+                            if start_mode == 'user':
+                                draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
+                                while True:
+                                    pause(pause_t, x0, y4)
+                                    play_again()                    
+                                    if next_round[0] != 0:               
+                                        break
+                            else:
+                                next_round[0] = 1
+                                draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6)
+                                while True:
+                                    pause(pause_t, x0, y4)
+                                    move_switch()                    
+                                    if move_on[0] == 1:
+                                        wn.tracer(2)
+                                        break
+                            if next_round[0] == 1:
+                                whos_on[0] = 'user'                    
+                                wn.clearscreen()
+                                break
+                            else:                           
+                                mode[0] = 'end' 
+                                break                    
+                        #if attempt didn't match assignment
                         else:
-                            proceed = 2
-                    #if success, i.e. identical colors in identical positions as assignment, draw assignm, solution, stats; clean out vars & break        
-                    if proceed == 5:
-                        wn.tracer(1)
-                        #draw solution + header
-                        draw_header(write_t, 'Solution', font1, 'black', x2, y2)
-                        draw_bars(solution[i], x2, y3, x_off * 4, y_off * 0)
-                        draw_bars(assignm, x1, y3, x_off * 4, y_off * 0)
-                        #collect match and game stats and display
-                        wn.tracer(1)
-                        rounds_played += 0.5
-                        comp_attempts += i
-                        time = strftime("%d.%m.%Y, %H:%M", localtime())
-                        m_stats = match_stats(time, int(rounds_played), comp_attempts, user_attempts)                    
-                        draw_header(write_t, "Match stats:", font1, 'red', x1, y5)
-                        draw_header(write_t, "Rounds played: "+ str(int(rounds_played)), font1, 'black', x1, y5 - line_space)
-                        draw_header(write_t, 'User attempts: '+ str(user_attempts), font1, 'black', x1, y5 - line_space * 2)
-                        draw_header(write_t, 'Comp attempts: '+ str(comp_attempts), font1, 'black', x1, y5 - line_space * 3)
-                        if file_path != '':
-                            g_stats = game_stats(file_path)
-                            draw_header(write_t, 'Previous games: ', font1, 'red', x1, y5 - line_space * 4)
-                            draw_header(write_t, 'Games total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
-                            draw_header(write_t, 'Totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
-                            draw_header(write_t, 'Totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
-                        #store attempts and counts for analysis
-                        stored_solutions = solutions
-                        stored_black_counts = black_counts_absolute
-                        stored_white_counts = white_counts_absolute
-                        #clean out vars
-                        white_counts_absolute = []
-                        black_counts_absolute = []                
-                        #ask user for another round
-                        if start_mode == 'user':
-                            draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
-                            while True:
-                                pause(pause_t, x0, y4)
-                                play_again()                    
-                                if next_round[0] != 0:               
-                                    break
-                        else:
-                            next_round[0] = 1
-                            draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6)
-                            while True:
-                                pause(pause_t, x0, y4)
-                                move_switch()                    
-                                if move_on[0] == 1:
-                                    wn.tracer(2)
-                                    break
-                        if next_round[0] == 1:
-                            proceed = 0
-                            whos_on[0] = 'user'                    
-                            wn.clearscreen()
-                            break
-                        else:                           
-                            mode[0] = 'end' 
-                            break                    
-                    if proceed == 2:
-                        #black and white count of this solution against each previous solution must be same as absolute black and white counts of those previous solutions
-                        if i >= 1:
-                            a = 0
-                            while a < i:             
-                                if black_count(solution[a], solution[i]) != black_counts_absolute[a]:
-                                    a = i + 1                    
-                                else:
-                                    a += 1    
-                            if a == i:
-                                proceed = 3
-                            if a > i:
-                                del black_counts_absolute[-1]
-                                del solution[-1]
-                                proceed = 0            
-                            if proceed == 3:
-                                white_counts_absolute.append(white_count(assignm, solution[i]))
+                            #when not the first attempt, let's compare marks to marks of previous attempts
+                            if i >= 1:
                                 a = 0
-                                while a < i:
-                                    if white_count(solution[a], solution[i]) != white_counts_absolute[a]:
-                                        a = i + 1                    
+                                while a < i:             
+                                    if black_count(solution[a], solution[i]) != black_counts_absolute[a]:
+                                        del black_counts_absolute[-1]
+                                        del solution[-1]
+                                        break                        
                                     else:
                                         a += 1    
                                 if a == i:
-                                    proceed = 4
-                                if a > i:
-                                    del white_counts_absolute[-1]
-                                    del black_counts_absolute[-1]
-                                    del solution[-1]
-                                    proceed = 0                   
-                            if proceed == 4:
-                                solutions.append(solution[i])                        
-                                #draw solution, black, white marks
-                                draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)    
-                                draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
-                                draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
+                                    white_counts_absolute.append(white_count(assignm, solution[i]))
+                                    a = 0
+                                    while a < i:
+                                        if white_count(solution[a], solution[i]) != white_counts_absolute[a]:
+                                            del white_counts_absolute[-1]
+                                            del black_counts_absolute[-1]
+                                            del solution[-1]
+                                            break                     
+                                        else:
+                                            a += 1    
+                                    if a == i:
+                                        solutions.append(solution[i])                        
+                                        #draw solution, black, white marks
+                                        draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)    
+                                        draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
+                                        draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
+                                        sleep(2)
+                                        i += 1
+                                        break      
+                            else:
+                                white_counts_absolute.append(white_count(assignm, solution[i]))
+                                solutions.append(solution[i])                    
+                                #draw attempts header, solution, marks header and marks
+                                draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
+                                draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
+                                draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
+                                draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
+                                draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
                                 sleep(2)
                                 i += 1
-                                proceed = 0      
-                        else:
-                            white_counts_absolute.append(white_count(assignm, solution[i]))
-                            solutions.append(solution[i])                    
-                            #draw attempts header, solution, marks header and marks
-                            draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
-                            draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
-                            draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
-                            draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
-                            draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
-                            sleep(2)
-                            i += 1
-                            proceed = 0
-            
+                                break
             '''comp assigns problem, user solves'''
             if whos_on[0] == 'user':
                 if mode[0] != 'duo':
                     break
                 wn.bgcolor('lightgreen')
-                wn.tracer(1)
+                wn.tracer(2)
                 i = 0
                 next_round[0] = 0
                 move_on = [0]
@@ -729,13 +726,15 @@ while True:
                 else:    
                     draw_header(write_t, 'human is on', font1, 'red', x1, y1, 'bold')
                 draw_full_set(full_set, x1, y7, x_off * 8)
-                assignm = random.sample(full_set,4)        
+                draw_marks(4, x3, y7 - y_off, x_off * 2, y_off * -12 * i, 'black')
+                draw_marks(4, x3 + x_off * 14, y7 - y_off, x_off * 2, y_off * -12 * i, 'white')
+                assignm = random.sample(full_set,4)
+                wn.tracer(1)
                 #draw mystery assignm + header
                 draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
                     #let user choose colors
-                    wn.tracer(1)
                     u_choice = []
                     for j in range(4):
                         u_choice.append(source_set[0])
@@ -759,16 +758,16 @@ while True:
                         user_attempts += i
                         time = strftime("%d.%m.%Y, %H:%M", localtime())
                         m_stats = match_stats(time, int(rounds_played), comp_attempts, user_attempts)                    
-                        draw_header(write_t, "Match stats:", font1, 'red', x1, y5)
-                        draw_header(write_t, "Rounds played: "+ str(int(rounds_played)), font1, 'black', x1, y5 - line_space)
-                        draw_header(write_t, 'User attempts: '+ str(user_attempts), font1, 'black', x1, y5 - line_space * 2)
-                        draw_header(write_t, 'Comp attempts: '+ str(comp_attempts), font1, 'black', x1, y5 - line_space * 3)
+                        draw_header(write_t, "match stats:", font1, 'red', x1, y5)
+                        draw_header(write_t, "rounds played: "+ str(int(rounds_played)), font1, 'black', x1, y5 - line_space)
+                        draw_header(write_t, 'user attempts: '+ str(user_attempts), font1, 'black', x1, y5 - line_space * 2)
+                        draw_header(write_t, 'comp attempts: '+ str(comp_attempts), font1, 'black', x1, y5 - line_space * 3)
                         if file_path != '':
                             g_stats = game_stats(file_path)
-                            draw_header(write_t, 'Previous games: ', font1, 'red', x1, y5 - line_space * 4)
-                            draw_header(write_t, 'Games total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
-                            draw_header(write_t, 'Totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
-                            draw_header(write_t, 'Totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
+                            draw_header(write_t, 'previous matches: ', font1, 'red', x1, y5 - line_space * 4)
+                            draw_header(write_t, 'matches total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
+                            draw_header(write_t, 'totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
+                            draw_header(write_t, 'totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
                         #store attempts and counts for analysis
                         stored_solutions = solutions
                         stored_black_counts = black_counts_absolute
@@ -849,6 +848,7 @@ while True:
                                     draw_header(write_t, 'sorry, too many errors to display on screen... ', font1, 'blue', x1, y3 - y_off * 6 - line_space_small * 29, 'small')
                             draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6 - line_space * 4)
                             move_on[0] = 0
+                            wn.tracer(1)
                             while True:
                                 pause(pause_t, x0, y4)
                                 move_switch()                    
@@ -909,7 +909,7 @@ while True:
                                wn.clearscreen()
                                break                      
                     
-                    #if attempt was not successfull, calculate white marks and draw attempt, marks
+                    #if attempt was not successfull, calculate white marks and draw attempt bars, marks
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
                         draw_bars(solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
@@ -938,7 +938,7 @@ while True:
         if u_name != '':
             draw_header(write_t, 'bye, '+ u_name, font1, 'black', x3, y4)
         else:
-            draw_header(write_t, 'bye', font1, 'black', x3, y4)        
-        break    
-
-wn.mainloop()
+            draw_header(write_t, 'bye', font1, 'black', x3, y4)
+        sleep(2)
+        break 
+#wn.mainloop()
