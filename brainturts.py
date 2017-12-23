@@ -8,6 +8,7 @@ import turtle
 from time import localtime, strftime, sleep
 import random
 import json
+import tkinter.simpledialog
 
 #set up screen
 screen_width = 1.0
@@ -155,7 +156,7 @@ def select_color_s(x,y):
     pos = round((x1 - x) / (x_off * 12))
     if pos < 0:
         pos = pos * -1
-    count = pos + short_row * row
+    count = int(pos + short_row * row)
     picked_colors.append(all_colors[count])
     for i in range(len(col_ts)):
         col_ts[i].color(picked_colors[(i + 1) * -1])
@@ -214,8 +215,11 @@ def draw_picked_cols(colorlist, x, y, x_offset, y_offset, size = 'default', shap
         col_ts[i].showturtle()
 
 def color_submit(x, y):
-    if x > x2 and x < x2 + x_off * 20 and y > y2 and y < y2 + y_off * 3:
+    if x > x2 and x < x2 + x_off * 13 and y > y2 -y_off * 2 and y < y2 + y_off * 2:
         submit_t.pencolor('grey') 
+
+def show_pos(x,y):
+    wn.title((x, y))
         
 def submit(x, y):
     submit_t.hideturtle()
@@ -259,7 +263,6 @@ def black_count(list1,list2):
     y = len([i for i, j in zip(list1,list2) if i == j])
     return y
 
-#set up set
 def get_set(src):
     new_set = []
     for i in range(max_num_color):
@@ -366,7 +369,7 @@ bar_height = 100 * gsize
 bar_width = 10 * gsize
 mark_height = 20 * gsize
 mark_width = 5 * gsize
-turtle_size_regular = (1 * gsize)
+turtle_size_regular = int((1 * gsize))
 turtle_size_big = round(2 * gsize)
 line_space = 25 * gsize
 line_space_small = 18 * gsize
@@ -381,6 +384,7 @@ mode = ['start']
 u_colors = []
 move_on = [0]
 num_pegs = 4
+max_num_color = 2
 
 ''' START OF GAME '''
 
@@ -419,12 +423,12 @@ while True:
         all_colors = ['Black', 'Navy', 'DarkBlue', 'MediumBlue', 'Blue', 'DarkGreen', 'Green', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen', 'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue', 'LightSeaGreen', 'ForestGreen', 'SeaGreen', 'DarkSlateGray', 'LimeGreen', 'MediumSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'DarkSlateBlue', 'MediumTurquoise', 'Indigo', 'DarkOliveGreen', 'CadetBlue', 'CornflowerBlue', 'RebeccaPurple', 'MediumAquaMarine', 'DimGray', 'SlateBlue', 'SlateGray', 'LightSlateGray', 'MediumSlateBlue', 'Chartreuse', 'Aquamarine', 'Maroon', 'Purple', 'Olive', 'Grey', 'SkyBlue', 'LightSkyBlue', 'PaleGreen', 'DarkGray', 'DarkGrey', 'LightBlue', 'GreenYellow', 'PaleTurquoise', 'LightSteelBlue', 'PowderBlue', 'FireBrick', 'DarkGoldenRod', 'MediumOrchid', 'RosyBrown', 'DarkKhaki', 'Silver', 'MediumVioletRed', 'IndianRed', 'Peru', 'Chocolate', 'LightGray', 'Orchid', 'GoldenRod', 'Gainsboro', 'Plum', 'BurlyWood', 'LightCyan', 'Lavender', 'DarkSalmon', 'Violet', 'PaleGoldenRod', 'LightCoral', 'Khaki', 'AliceBlue', 'HoneyDew', 'Azure', 'SandyBrown', 'Wheat', 'Beige', 'MintCream', 'GhostWhite', 'Salmon', 'AntiqueWhite', 'Linen', 'LightGoldenRodYellow', 'OldLace', 'Red', 'Fuchsia', 'Magenta', 'DeepPink', 'OrangeRed', 'Tomato', 'HotPink', 'Coral', 'DarkOrange', 'LightSalmon', 'Orange', 'LightPink', 'Pink', 'Gold', 'PeachPuff', 'NavajoWhite', 'Moccasin', 'Bisque', 'MistyRose', 'BlanchedAlmond', 'PapayaWhip', 'LavenderBlush', 'SeaShell', 'Cornsilk', 'LemonChiffon', 'Snow', 'Yellow', 'LightYellow']
         picked_colors = ['white', 'white','white','white','white']
         draw_header(write_t, 'Please choose your name', font1, 'black', x2, y2)
-        u_name = wn.textinput('username', 'Please, type your name')
+        u_name = tkinter.simpledialog.askstring('username:', 'please, type your name')
         wn.clearscreen()
         wn.bgcolor('lightgreen')
         #ask user for for doublettes
         draw_header(write_t, "Are double colors allowed?", font1, 'black', x2, y2)
-        doubles = turtle.textinput('Doubles allowed', 'Yes or no?')
+        doubles = tkinter.simpledialog.askstring('doubles allowed:', 'yes or no?')
         if doubles in ('yes', 'Yes', 'y'):
             max_num_color = 2
         else:
@@ -499,7 +503,7 @@ while True:
         bar_width = 10 * gsize
         mark_height = 20 * gsize
         mark_width = 5 * gsize
-        turtle_size_regular = (1 * gsize)
+        turtle_size_regular = int((1 * gsize))
         turtle_size_big = round(2 * gsize)
         line_space = 25 * gsize
         line_space_small = 18 * gsize
@@ -507,15 +511,12 @@ while True:
         long_row = round(24 * gsize)
         font_small = round(12 * gsize)
         font_regular = round(16 * gsize)
-        font1 = 'arial'
-        font2 ='helvetica'
         
         wn.bgcolor('lightgreen')
         wn.tracer(1)
         wn.title('mindturts - human vs. computer')
         #set up vars for game logic
         i = 0
-        proceed = 0
         solution = []
         solutions = []
         black_counts_absolute = []
@@ -527,6 +528,7 @@ while True:
         next_round = [0]
         next_stage = [0]
         see_analysis = [0]
+        alert = []
         grey_bars = ['grey', 'grey', 'grey', 'grey']    
         if file_path != '':
             with open(file_path) as storage:
@@ -632,7 +634,7 @@ while True:
                             draw_header(write_t, 'comp attempts: '+ str(comp_attempts), font1, 'black', x1, y5 - line_space * 3)
                             if file_path != '':
                                 g_stats = game_stats(file_path)
-                                draw_header(write_t, 'previous matchess: ', font1, 'red', x1, y5 - line_space * 4)
+                                draw_header(write_t, 'previous matches: ', font1, 'red', x1, y5 - line_space * 4)
                                 draw_header(write_t, 'matches total: '+ str(int(g_stats[0])), font1, 'black', x1, y5 - line_space * 5)
                                 draw_header(write_t, 'totals user attempts: '+ str(g_stats[2]), font1, 'black', x1, y5 - line_space * 6)
                                 draw_header(write_t, 'totals comp attempts: '+ str(g_stats[1]), font1, 'black', x1, y5 - line_space * 7)
@@ -718,6 +720,7 @@ while True:
                 next_round[0] = 0
                 move_on = [0]
                 solutions = []
+                raise_alert = 0
                 #draw full set, human is on
                 if u_name != '':
                     draw_header(write_t, u_name + ' is on', font1, 'red', x1, y1, 'bold')
@@ -729,7 +732,7 @@ while True:
                 assignm = random.sample(full_set,4)
                 wn.tracer(1)
                 #draw mystery assignm + header
-                draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
+                draw_header(write_t, assignm, font1, 'black', x1, y2)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
                     #let user choose colors
@@ -774,77 +777,9 @@ while True:
                         white_counts_absolute = []
                         black_counts_absolute = []
                         #ask for analysis
-                        draw_header(write_t, "press 'a' for analysis of your attempts, else press 's'", font1, 'blue', x1, y6 - line_space * 2)
-                        see_analysis[0] = 0
-                        show_analysis()
-                        while True:
-                            pause(pause_t, x0, y4)                                                
-                            if see_analysis[0] != 0:               
-                                break                
-                        wn.clearscreen()
-                        #calculate and display analysis
-                        if see_analysis[0] == 1:
-                            wn.bgcolor('lightgreen')
-                            wn.tracer(2)
-                            alert = []
-                            i = len(stored_solutions) -1
-                            if i <= 1:
-                                alert.append('at least two attempts needed for analysis, you got lucky!')
-                            if i >= 1:
-                                attempt_counter = 1            
-                                while attempt_counter < i:
-                                    a = 0
-                                    alert_counter = 0
-                                    #alert += '\n'
-                                    while a < attempt_counter:
-                                        if black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_black_counts[a]:
-                                            alert.append('In attempt ' + str((attempt_counter + 1)) + ', we see ' + str(black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' black(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_black_counts[a]))
-                                            alert_counter += 1
-                                        if white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter]) != stored_white_counts[a] - stored_black_counts[a]:
-                                            alert.append('In attempt ' + str((attempt_counter + 1)) + ', we find ' + str(white_count(stored_solutions[a], stored_solutions[attempt_counter]) - black_count(stored_solutions[a], stored_solutions[attempt_counter])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(stored_white_counts[a] - stored_black_counts[a]))
-                                            alert_counter += 1
-                                        a +=1
-                                    if alert_counter < 1:
-                                        alert.append('Couldn\'t find any errors in attempt ' + str((attempt_counter + 1)))
-                                    attempt_counter += 1
-                                    alert.append('')
-                            draw_header(write_t, 'Analysis', font1, 'red', x1, y2)                            
-                            #draw headers, solution
-                            draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
-                            draw_header(write_t, 'Marks', font1, 'black', x3 + x_off * 24, y2)
-                            draw_header(write_t, 'Solution', font1, 'black', x2, y2)
-                            draw_bars(stored_solutions[-1], x2, y3, x_off * 4, y_off * 0)                           
-                            #draw attempts, black and white counts
-                            for i in range(len(stored_solutions) - 1):    
-                                if i > 4:
-                                    draw_bars(stored_solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
-                                else:
-                                    draw_bars(stored_solutions[i], x3, y3, x_off * 4, y_off * -12 * i)
-                                if i > 4:
-                                    draw_marks(stored_black_counts[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i -5), 'black')
-                                    draw_marks(stored_white_counts[i] - stored_black_counts[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i -5), 'white')
-                                else:
-                                    draw_marks(stored_black_counts[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
-                                    draw_marks(stored_white_counts[i] - stored_black_counts[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
-                            #draw analysis message        
-                            if len(alert) <= 28:
-                                for msg in range(len(alert)):
-                                    if 'errors' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                                    if 'black' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                                    if 'white' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'DarkSlateGrey', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                            else:
-                                for msg in range(28):
-                                    if 'no errors' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                                    if 'black' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                                    if 'white' in alert[msg]:
-                                        draw_header(write_t, alert[msg], font2, 'DarkSlateGrey', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
-                                    draw_header(write_t, 'sorry, too many errors to display on screen... ', font1, 'blue', x1, y3 - y_off * 6 - line_space_small * 29, 'small')
-                            draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6 - line_space * 4)
+                        if raise_alert < 1:
+                            draw_header(write_t, str(i) + " perfect attempts, couldn't have done it better myself...", font1, 'blue', x1, y6)
+                            draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6 - line_space * 2)
                             move_on[0] = 0
                             wn.tracer(1)
                             while True:
@@ -877,36 +812,120 @@ while True:
                                 break
                             else:                           
                                 mode[0] = 'end'
-                                break 
-                        #in case analylis is not requested, ask for another round or move to 'comp is on'        
-                        if see_analysis[0] == 2:
-                            wn.bgcolor('lightgreen')
-                            wn.tracer(2)
-                            #ask user for another round
-                            if start_mode == 'comp':
-                                if u_name != '':
-                                    draw_header(write_t, 'mindturts - ' + u_name + ' against comp', font1, 'red', x1, y1)
-                                else:
-                                    draw_header(write_t, 'mindturts - human against comp', font1, 'red', x1, y1)
-                                draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
-                                next_round[0] = 0
-                                while True:
-                                    pause(pause_t, x0, y4)                            
-                                    play_again()                    
-                                    if next_round[0] != 0:               
-                                        break
-                            else:
-                                next_round[0] = 1
-                            if next_round[0] is 1:
-                                whos_on[0] = 'comp'
-                                wn.clearscreen()                    
                                 break
-                            else:                           
-                               mode[0] = 'end'
-                               wn.clearscreen()
-                               break                      
+                        else:
+                            draw_header(write_t, "you've had some inconsistencies in your attemps", font1, 'blue', x1, y6 - line_space * 2)
+                            draw_header(write_t, "press 'a' to get an analysis, else press 's'", font1, 'blue', x1, y6 - line_space * 3)
+                            see_analysis[0] = 0
+                            show_analysis()
+                            while True:
+                                pause(pause_t, x0, y4)                                                
+                                if see_analysis[0] != 0:               
+                                    break                
+                            wn.clearscreen()
+                            #calculate and display analysis
+                            if see_analysis[0] == 1:
+                                wn.bgcolor('lightgreen')
+                                wn.tracer(2)
+                                draw_header(write_t, 'Analysis', font1, 'red', x1, y2)                            
+                                #draw headers, solution
+                                draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
+                                draw_header(write_t, 'Marks', font1, 'black', x3 + x_off * 24, y2)
+                                draw_header(write_t, 'Solution', font1, 'black', x2, y2)
+                                draw_bars(stored_solutions[-1], x2, y3, x_off * 4, y_off * 0)                           
+                                #draw attempts, black and white counts
+                                for i in range(len(stored_solutions) - 1):    
+                                    if i > 4:
+                                        draw_bars(stored_solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
+                                    else:
+                                        draw_bars(stored_solutions[i], x3, y3, x_off * 4, y_off * -12 * i)
+                                    if i > 4:
+                                        draw_marks(stored_black_counts[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i -5), 'black')
+                                        draw_marks(stored_white_counts[i] - stored_black_counts[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i -5), 'white')
+                                    else:
+                                        draw_marks(stored_black_counts[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
+                                        draw_marks(stored_white_counts[i] - stored_black_counts[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
+                                #draw analysis message        
+                                if len(alert) <= 28:
+                                    for msg in range(len(alert)):
+                                        if 'errors' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                        if 'black' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                        if 'white' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'DarkSlateGrey', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                else:
+                                    for msg in range(28):
+                                        if 'no errors' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'blue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                        if 'black' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'DarkSlateBlue', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                        if 'white' in alert[msg]:
+                                            draw_header(write_t, alert[msg], font2, 'DarkSlateGrey', x1, y3 - y_off * 6 - line_space_small * msg, 'small')
+                                        draw_header(write_t, 'sorry, too many errors to display on screen... ', font2, 'blue', x1, y3 - y_off * 6 - line_space_small * 29, 'small')
+                                draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6 - line_space * 4)
+                                move_on[0] = 0
+                                wn.tracer(1)
+                                while True:
+                                    pause(pause_t, x0, y4)
+                                    move_switch()                    
+                                    if move_on[0] == 1:               
+                                        break
+                                wn.tracer(2)
+                                wn.clearscreen()                                    
+                                #ask user for another round
+                                if start_mode == 'comp':
+                                    wn.bgcolor('lightgreen')
+                                    if u_name != '':
+                                        draw_header(write_t, 'mindturts - ' + u_name + ' against comp', font1, 'red', x1, y1)
+                                    else:
+                                        draw_header(write_t, 'mindturts - human against comp', font1, 'red', x1, y1)
+                                    draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
+                                    next_round[0] = 0
+                                    wn.tracer(1)
+                                    while True:
+                                        pause(pause_t, x0, y4)                            
+                                        play_again()                    
+                                        if next_round[0] != 0:               
+                                            break
+                                else:
+                                    next_round[0] = 1
+                                if next_round[0] is 1:
+                                    whos_on[0] = 'comp'
+                                    wn.clearscreen()
+                                    break
+                                else:                           
+                                    mode[0] = 'end'
+                                    break 
+                            #in case analylis is not requested, ask for another round or move to 'comp is on'        
+                            if see_analysis[0] == 2:
+                                wn.bgcolor('lightgreen')
+                                wn.tracer(2)
+                                #ask user for another round
+                                if start_mode == 'comp':
+                                    if u_name != '':
+                                        draw_header(write_t, 'mindturts - ' + u_name + ' against comp', font1, 'red', x1, y1)
+                                    else:
+                                        draw_header(write_t, 'mindturts - human against comp', font1, 'red', x1, y1)
+                                    draw_header(write_t, "press 'y' for another round, press 'n' to quit", font1, 'blue', x1, y6)
+                                    next_round[0] = 0
+                                    while True:
+                                        pause(pause_t, x0, y4)                            
+                                        play_again()                    
+                                        if next_round[0] != 0:               
+                                            break
+                                else:
+                                    next_round[0] = 1
+                                if next_round[0] is 1:
+                                    whos_on[0] = 'comp'
+                                    wn.clearscreen()                    
+                                    break
+                                else:                           
+                                   mode[0] = 'end'
+                                   wn.clearscreen()
+                                   break                      
                     
-                    #if attempt was not successfull, calculate white marks and draw attempt bars, marks
+                    #if attempt was not successfull, calculate white marks, prepare analysis and draw attempt bars, marks
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
                         draw_bars(solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
@@ -915,13 +934,31 @@ while True:
                     white_counts_absolute.append(white_count(assignm, solutions[i]))            
                     draw_header(write_t, 'Marks', font1, 'black', x3 +x_off * 24, y2)
                     if i > 4:
-                        draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i -5), 'black')
-                        draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i -5), 'white')
+                        draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i - 4), 'black')
+                        draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i - 4), 'white')
                     else:
                         draw_marks(black_counts_absolute[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
                         draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
+                    if i >= 1:
+                        a = 0
+                        alert_counter = 0
+                        raise_alert = 0
+                        while a < i:             
+                            if black_count(solutions[a], solutions[i]) != black_counts_absolute[a]:
+                                alert.append('in attempt ' + str((i + 1)) + ', we see ' + str(black_count(solutions[a], solutions[i])) + ' black(s) against attempt ' +  str(a + 1) + ', which had ' + str(black_counts_absolute[a]))
+                                alert_counter += 1
+                                raise_alert = 1
+                            if white_count(solutions[a], solutions[i]) != white_counts_absolute[a]:
+                                alert.append('in attempt ' + str((i + 1)) + ', we find ' + str(white_count(solutions[a], solutions[i]) - black_count(solutions[a], solutions[i])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(white_counts_absolute[a] - black_counts_absolute[a]))
+                                alert_counter += 1
+                                raise_alert = 1
+                            a += 1
+                        if alert_counter < 1:
+                            alert.append('attempt ' + str((i + 1)) + ' was perfectly congruent with earlier attempts')
+                        alert.append('')
                     i += 1
     
+        '''Shut down game'''
     elif mode[0] == 'end':
         wn.clearscreen()
         wn.bgcolor('lightgreen')
