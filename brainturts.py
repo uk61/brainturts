@@ -732,7 +732,7 @@ while True:
                 assignm = random.sample(full_set,4)
                 wn.tracer(1)
                 #draw mystery assignm + header
-                draw_header(write_t, assignm, font1, 'black', x1, y2)
+                draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
                     #let user choose colors
