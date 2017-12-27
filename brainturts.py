@@ -9,6 +9,7 @@ from time import localtime, strftime, sleep
 import random
 import json
 import tkinter.simpledialog
+import itertools
 
 #set up screen
 screen_width = 1.0
@@ -243,7 +244,7 @@ submit_t = turtle.Turtle(visible = False)
 pause_t = turtle.Turtle(visible = False)
 write_t = turtle.Turtle(visible = False)
     
-'''prepare games logic'''
+'''games logic'''
 #define counting functions
 def white_count(list1,list2):
     #count occurrences of identical items in two lists
@@ -270,6 +271,41 @@ def get_set(src):
             new_set.append(item)
     return new_set            
 
+def all_combs(src):
+    combs = []
+    a = ''
+    for comb in itertools.permutations(src,4):
+        if comb in combs:
+            a = a
+        else:
+            combs.append(comb)
+    return combs
+
+def possible_solutions(attempts, combs):
+    i = len(attempts)
+    temp_sols = []
+    final_sols = []
+    for comb in combs:
+        a = 0
+        while a < i:
+            if white_count(comb, attempts[a]) != white_count(attempts[a],assignm):
+                break
+            else:
+                a += 1
+        if a / i == 1:
+            temp_sols.append(comb)
+    for comb in temp_sols:
+        a = 0
+        while a < i:
+            if black_count(comb, attempts[a]) != black_count(attempts[a],assignm):
+                break
+            else:
+                a += 1
+        if a / i == 1:
+            final_sols.append(comb)
+    return len(final_sols)
+
+# user interaction
 def duo_mode():
     mode[0] = 'duo'    
 def opt_mode():
@@ -568,6 +604,7 @@ while True:
                 if mode[0] != 'duo':
                     break
                 wn.bgcolor('lightgreen')
+                wn.title('mindturts - human vs. computer')
                 i = 0
                 next_round[0] = 0
                 move_on = [0]
@@ -602,6 +639,7 @@ while True:
                 draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
                 wn.tracer(1)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
+                possible_combs = all_combs(full_set)
                 ''' Enter attempt loop'''                
                 while True:
                     if whos_on[0] != 'comp' or mode[0] != 'duo':
@@ -619,6 +657,7 @@ while True:
                         #if success, i. e. attempt matches assignment, draw assignm, solution, stats; clean out vars & break        
                             wn.tracer(1)
                             #draw solution + header
+                            wn.title('solved!')
                             draw_header(write_t, 'Solution', font1, 'black', x2, y2)
                             draw_bars(solution[i], x2, y3, x_off * 4, y_off * 0)
                             draw_bars(assignm, x1, y3, x_off * 4, y_off * 0)
@@ -691,7 +730,10 @@ while True:
                                     if a == i:
                                         solutions.append(solution[i])                        
                                         #draw solution, black, white marks
-                                        draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)    
+                                        draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)
+                                        possible_sols = possible_solutions(solutions, possible_combs)
+                                        sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                                        wn.title(sols_msg)
                                         draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
                                         draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
                                         sleep(2)
@@ -704,6 +746,9 @@ while True:
                                 draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
                                 draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
                                 draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
+                                possible_sols = possible_solutions(solutions, possible_combs)
+                                sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                                wn.title(sols_msg)
                                 draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
                                 draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
                                 sleep(2)
@@ -715,6 +760,7 @@ while True:
                 if mode[0] != 'duo':
                     break
                 wn.bgcolor('lightgreen')
+                wn.title('mindturts - human vs. computer')
                 wn.tracer(2)
                 i = 0
                 next_round[0] = 0
@@ -730,9 +776,10 @@ while True:
                 draw_marks(4, x3, y7 - y_off, x_off * 2, y_off * -12 * i, 'black')
                 draw_marks(4, x3 + x_off * 14, y7 - y_off, x_off * 2, y_off * -12 * i, 'white')
                 assignm = random.sample(full_set,4)
+                possible_combs = all_combs(full_set)
                 wn.tracer(1)
                 #draw mystery assignm + header
-                draw_header(write_t, assignm, font1, 'black', x1, y2)
+                draw_header(write_t, 'Assignment', font1, 'black', x1, y2)
                 draw_bars(grey_bars, x1, y3, x_off * 4, y_off * 0)
                 while True:
                     #let user choose colors
@@ -750,6 +797,7 @@ while True:
                     black_counts_absolute.append(black_count(assignm, solutions[i]))
                     #...if success, draw assignm, stats, analysis and break
                     if black_counts_absolute[i] == 4:
+                        wn.title('solved!')
                         draw_header(write_t, 'Solution', font1, 'black', x2, y2)
                         draw_bars(solutions[i], x2, y3, x_off * 4, y_off * 0)
                         draw_bars(assignm, x1, y3, x_off * 4, y_off * 0)
@@ -926,20 +974,23 @@ while True:
                                    break                      
                     
                     #if attempt was not successfull, calculate white marks, prepare analysis and draw attempt bars, marks
+                    possible_sols = possible_solutions(solutions, possible_combs)
+                    sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                    wn.title(sols_msg)
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
                         draw_bars(solutions[i], x4, y3, x_off * 4, y_off * -12 * (i -5))
                     else:
                         draw_bars(solutions[i], x3, y3, x_off * 4, y_off * -12 * i)
                     white_counts_absolute.append(white_count(assignm, solutions[i]))            
-                    draw_header(write_t, 'Marks', font1, 'black', x3 +x_off * 24, y2)
+                    draw_header(write_t, 'Marks', font1, 'black', x3 +x_off * 24, y2)                    
                     if i > 4:
                         draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i - 4), 'black')
                         draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i - 4), 'white')
                     else:
                         draw_marks(black_counts_absolute[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
                         draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
-                    if i >= 1:
+                    if i >= 1:                                                
                         a = 0
                         alert_counter = 0
                         raise_alert = 0
@@ -962,6 +1013,7 @@ while True:
     elif mode[0] == 'end':
         wn.clearscreen()
         wn.bgcolor('lightgreen')
+        wn.title('bye')
         if file_path != '' and 'm_stats' in locals():
             with open(file_path) as storage:
                 g_stats = json.load(storage)
