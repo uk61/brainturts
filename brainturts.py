@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-######Set path to a file where match statistics can be stored#####
+######Set path to a file where statistics and user options can be stored
 file_path = ""
 ########
 
@@ -218,9 +218,6 @@ def draw_picked_cols(colorlist, x, y, x_offset, y_offset, size = 'default', shap
 def color_submit(x, y):
     if x > x2 and x < x2 + x_off * 13 and y > y2 -y_off * 2 and y < y2 + y_off * 2:
         submit_t.pencolor('grey') 
-
-def show_pos(x,y):
-    wn.title((x, y))
         
 def submit(x, y):
     submit_t.hideturtle()
@@ -273,10 +270,9 @@ def get_set(src):
 
 def all_combs(src):
     combs = []
-    a = ''
     for comb in itertools.permutations(src,4):
         if comb in combs:
-            a = a
+            pass
         else:
             combs.append(comb)
     return combs
@@ -732,7 +728,7 @@ while True:
                                         #draw solution, black, white marks
                                         draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)
                                         possible_sols = possible_solutions(solutions, possible_combs)
-                                        sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                                        sols_msg = 'still ' + str(possible_sols) +' valid solutions to choose from'
                                         wn.title(sols_msg)
                                         draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
                                         draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
@@ -747,7 +743,7 @@ while True:
                                 draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
                                 draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
                                 possible_sols = possible_solutions(solutions, possible_combs)
-                                sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                                sols_msg = 'still ' + str(possible_sols) +' valid solutions to choose from'
                                 wn.title(sols_msg)
                                 draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
                                 draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
@@ -824,7 +820,7 @@ while True:
                         #clean out vars
                         white_counts_absolute = []
                         black_counts_absolute = []
-                        #ask for analysis
+                        #close down user's turn
                         if raise_alert < 1:
                             draw_header(write_t, str(i) + " perfect attempts, couldn't have done it better myself...", font1, 'blue', x1, y6)
                             draw_header(write_t, "press 'g' when you are ready to move on", font1, 'blue', x1, y6 - line_space * 2)
@@ -861,6 +857,7 @@ while True:
                             else:                           
                                 mode[0] = 'end'
                                 break
+                        #ask for analysis and close down user's turn
                         else:
                             draw_header(write_t, "you've had some inconsistencies in your attemps", font1, 'blue', x1, y6 - line_space * 2)
                             draw_header(write_t, "press 'a' to get an analysis, else press 's'", font1, 'blue', x1, y6 - line_space * 3)
@@ -871,7 +868,7 @@ while True:
                                 if see_analysis[0] != 0:               
                                     break                
                             wn.clearscreen()
-                            #calculate and display analysis
+                            #display analysis
                             if see_analysis[0] == 1:
                                 wn.bgcolor('lightgreen')
                                 wn.tracer(2)
@@ -945,7 +942,7 @@ while True:
                                 else:                           
                                     mode[0] = 'end'
                                     break 
-                            #in case analylis is not requested, ask for another round or move to 'comp is on'        
+                            #in case analysis is not requested, ask for another round or move to 'comp is on'        
                             if see_analysis[0] == 2:
                                 wn.bgcolor('lightgreen')
                                 wn.tracer(2)
@@ -975,7 +972,7 @@ while True:
                     
                     #if attempt was not successfull, calculate white marks, prepare analysis and draw attempt bars, marks
                     possible_sols = possible_solutions(solutions, possible_combs)
-                    sols_msg = 'still ' + str(possible_sols) +' possible solutions available'
+                    sols_msg = 'still ' + str(possible_sols) +' possible solutions to choose from'
                     wn.title(sols_msg)
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
@@ -990,6 +987,7 @@ while True:
                     else:
                         draw_marks(black_counts_absolute[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
                         draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
+                    #analyse attempts, prepare analysis messages
                     if i >= 1:                                                
                         a = 0
                         alert_counter = 0
