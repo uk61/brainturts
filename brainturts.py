@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 ######Set path to a file where statistics and user options can be stored
 file_path = ""
@@ -268,38 +268,47 @@ def get_set(src):
             new_set.append(item)
     return new_set            
 
-def all_combs(src):
-    combs = []
-    for comb in itertools.permutations(src,4):
-        if comb in combs:
-            pass
+def bin_search(xs, t):
+    lb = 0
+    ub = len(xs)
+    while True:
+        if lb == ub: 
+           return -1
+        mid = (lb + ub) // 2
+        probe = xs[mid]
+        if probe == t:
+            return 1
+        if probe < t:
+            lb = mid +1
         else:
-            combs.append(comb)
+            ub = mid
+
+def rm_dups(xs):
+    xs = sorted(xs)
+    the_list = []
+    for item in xs:
+        if bin_search(the_list, item) == -1:
+            the_list.append(item)        
+    return the_list
+ 
+def all_combs(src):
+    perms = list(itertools.permutations(src,4))
+    combs = rm_dups(perms)
     return combs
 
 def possible_solutions(attempts, combs):
     i = len(attempts)
-    temp_sols = []
     final_sols = []
     for comb in combs:
         a = 0
         while a < i:
-            if white_count(comb, attempts[a]) != white_count(attempts[a],assignm):
-                break
-            else:
-                a += 1
-        if a / i == 1:
-            temp_sols.append(comb)
-    for comb in temp_sols:
-        a = 0
-        while a < i:
-            if black_count(comb, attempts[a]) != black_count(attempts[a],assignm):
+            if white_count(comb, attempts[a]) != white_count(attempts[a],assignm) or black_count(comb, attempts[a]) != black_count(attempts[a],assignm):
                 break
             else:
                 a += 1
         if a / i == 1:
             final_sols.append(comb)
-    return len(final_sols)
+    return final_sols
 
 # user interaction
 def duo_mode():
@@ -606,6 +615,7 @@ while True:
                 move_on = [0]
                 solution = []
                 solutions = []
+                possible_sols = [0]
                 #draw full set, comp is on
                 draw_header(write_t, 'comp is on', font1, 'red', x1, y1)
                 draw_full_set(full_set, x1, y7, x_off * 8)
@@ -727,8 +737,11 @@ while True:
                                         solutions.append(solution[i])                        
                                         #draw solution, black, white marks
                                         draw_bars(solution[i], x3, y3, x_off * 4, y_off * -12 * i)
-                                        possible_sols = possible_solutions(solutions, possible_combs)
-                                        sols_msg = 'still ' + str(possible_sols) +' valid solutions to choose from'
+                                        possible_sols.append(possible_solutions(solutions, possible_sols[i-1]))
+                                        if possible_sols[i] == 1:
+                                            sols_msg = 'only ' + str(len(possible_sols[i])) +' legit solution left'
+                                        else:
+                                            sols_msg = 'still ' + str(len(possible_sols[i])) +' legit solutions to choose from'
                                         wn.title(sols_msg)
                                         draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * -12 * i, 'black')
                                         draw_marks( white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
@@ -742,8 +755,8 @@ while True:
                                 draw_header(write_t, 'Attempts', font1, 'black', x3, y2)
                                 draw_bars(solution[i], x3, y3, x_off * 4, y_off * 0)
                                 draw_header(write_t, 'Marks', font1, 'black', x_off * 24, y2)
-                                possible_sols = possible_solutions(solutions, possible_combs)
-                                sols_msg = 'still ' + str(possible_sols) +' valid solutions to choose from'
+                                possible_sols[i] = possible_solutions(solutions, possible_combs)
+                                sols_msg = 'still ' + str(len(possible_sols[i])) +' possible solutions available'
                                 wn.title(sols_msg)
                                 draw_marks(black_counts_absolute[i], x_off * 24, y3, x_off * 2, y_off * 0, 'black')
                                 draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * 0, 'white')
@@ -762,6 +775,7 @@ while True:
                 next_round[0] = 0
                 move_on = [0]
                 solutions = []
+                possible_sols = [0]
                 raise_alert = 0
                 #draw full set, human is on
                 if u_name != '':
@@ -971,8 +985,14 @@ while True:
                                    break                      
                     
                     #if attempt was not successfull, calculate white marks, prepare analysis and draw attempt bars, marks
-                    possible_sols = possible_solutions(solutions, possible_combs)
-                    sols_msg = 'still ' + str(possible_sols) +' possible solutions to choose from'
+                    if i >= 1:
+                        possible_sols.append( possible_solutions(solutions, possible_sols[i-1]))
+                    else:
+                        possible_sols[i] = possible_solutions(solutions, possible_combs)
+                    if possible_sols[i] == 1:
+                        sols_msg = 'only ' + str(len(possible_sols[i])) +' legit solution left'
+                    else:
+                        sols_msg = 'still ' + str(len(possible_sols[i])) +' legit solutions to choose from'
                     wn.title(sols_msg)
                     draw_header(write_t, 'Attempts', font1, 'black', x3, y2)                   
                     if i > 4:
@@ -982,8 +1002,9 @@ while True:
                     white_counts_absolute.append(white_count(assignm, solutions[i]))            
                     draw_header(write_t, 'Marks', font1, 'black', x3 +x_off * 24, y2)                    
                     if i > 4:
-                        draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i - 4), 'black')
-                        draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i - 4), 'white')
+                        if i > 4:
+                            draw_marks(black_counts_absolute[i], x4 + x_off * 28, y3, x_off * 2, y_off * -12 * (i - 5), 'black')
+                            draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x4 + x_off * 36, y3, x_off * 2, y_off * -12 * (i - 5), 'white')
                     else:
                         draw_marks(black_counts_absolute[i], x3 + x_off * 28, y3, x_off * 2, y_off * -12 * i, 'black')
                         draw_marks(white_counts_absolute[i] - black_counts_absolute[i], x_off * 32, y3, x_off * 2, y_off * -12 * i, 'white')
@@ -997,7 +1018,7 @@ while True:
                                 alert.append('in attempt ' + str((i + 1)) + ', we see ' + str(black_count(solutions[a], solutions[i])) + ' black(s) against attempt ' +  str(a + 1) + ', which had ' + str(black_counts_absolute[a]))
                                 alert_counter += 1
                                 raise_alert = 1
-                            if white_count(solutions[a], solutions[i]) != white_counts_absolute[a]:
+                            if white_count(solutions[i], solutions[a]) - black_count(solutions[i], solutions[a]) != white_count(solutions[a], assignm) - black_count(solutions[a], assignm):
                                 alert.append('in attempt ' + str((i + 1)) + ', we find ' + str(white_count(solutions[a], solutions[i]) - black_count(solutions[a], solutions[i])) + ' white(s) against attempt ' +  str(a + 1) + ', which had ' + str(white_counts_absolute[a] - black_counts_absolute[a]))
                                 alert_counter += 1
                                 raise_alert = 1
