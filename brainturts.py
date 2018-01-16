@@ -437,7 +437,7 @@ while True:
         else:
             draw_header(write_t, 'welcome to mindturts!', font1, 'black', x2, y2)
         draw_header(write_t, 'be smarter than the computer', font1, 'black', x2, y2 - line_space * 2)
-        draw_header(write_t, 'mission: find out which four colored pegs the opponent secretely has chosen', font1, 'black', x2, y2 - line_space * 3)
+        draw_header(write_t, 'mission: find out which four colored pegs the opponent secretly has chosen', font1, 'black', x2, y2 - line_space * 3)
         draw_header(write_t, 'the computer can not err, so you better make no mistakes either...', font1, 'black', x2, y2 - line_space * 4)
         draw_header(write_t, 'good luck!', font1, 'black', x2, y2 - line_space * 5)
         if file_path != '':
